@@ -7,10 +7,43 @@ const geist = Geist({
   subsets: ["latin"],
 });
 
+const siteUrl = "https://adamosman.dev";
+
 export const metadata: Metadata = {
-  title: "Adam Osman — Developer Portfolio",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Adam Osman — Founder & CS Student",
+    template: "%s | Adam Osman",
+  },
   description:
-    "CS student at Georgia State University and founder of CourseConnect AI. Building at the intersection of AI and real-world problems.",
+    "CS + Business student at Georgia State University and founder of CourseConnect AI. Building AI products at the intersection of technology and real-world impact.",
+  openGraph: {
+    type: "website",
+    url: siteUrl,
+    siteName: "Adam Osman",
+    title: "Adam Osman — Founder & CS Student",
+    description:
+      "CS + Business student at Georgia State University and founder of CourseConnect AI. Building AI products at the intersection of technology and real-world impact.",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Adam Osman — Founder & CS Student",
+    description:
+      "CS + Business student at Georgia State University and founder of CourseConnect AI. Building AI products at the intersection of technology and real-world impact.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+    },
+  },
+  alternates: {
+    canonical: siteUrl,
+  },
 };
 
 export default function RootLayout({
@@ -23,7 +56,10 @@ export default function RootLayout({
       lang="en"
       className={`${geist.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-zinc-950 font-[family-name:var(--font-geist-sans)]">
+      <body
+        className="min-h-full font-[family-name:var(--font-geist-sans)]"
+        style={{ background: "var(--background)", color: "var(--foreground)" }}
+      >
         {children}
       </body>
     </html>
