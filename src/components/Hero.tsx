@@ -1,3 +1,5 @@
+import { AnimatedGradientText } from "@/components/magicui/animated-gradient-text";
+
 const techStack = [
   "Next.js",
   "TypeScript",
@@ -19,20 +21,30 @@ const marqueeItems = [...techStack, ...techStack];
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-screen flex-col overflow-hidden pt-16">
-      {/* Subtle violet glow at top — very faint depth cue */}
+    <section className="dot-grid relative flex min-h-screen flex-col overflow-hidden pt-16">
+      {/* Violet radial glow at top */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-[40vh]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[50vh]"
         style={{
           background:
-            "radial-gradient(ellipse 70% 40% at 50% 0%, rgba(109,40,217,0.07), transparent)",
+            "radial-gradient(ellipse 75% 50% at 50% 0%, rgba(109,40,217,0.1), transparent)",
         }}
       />
 
-      {/* Main content — pushes to bottom of viewport */}
-      <div className="flex flex-1 flex-col justify-end px-6 pb-10 md:px-12">
-        {/* Role / school tag */}
+      {/* Bottom fade so dot grid doesn't bleed into next section */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-32"
+        style={{
+          background:
+            "linear-gradient(to top, var(--background), transparent)",
+        }}
+      />
+
+      {/* Main content */}
+      <div className="relative flex flex-1 flex-col justify-end px-6 pb-10 md:px-12">
+        {/* Role / school label */}
         <p
           className="animate-fade-up mb-6 text-xs font-medium uppercase tracking-[0.2em] text-violet-400"
           style={{ animationDelay: "0ms" }}
@@ -40,49 +52,54 @@ export function Hero() {
           CS + Business&nbsp;&nbsp;·&nbsp;&nbsp;Georgia State University&nbsp;&nbsp;·&nbsp;&nbsp;Fall 2027
         </p>
 
-        {/* Name — fills the screen */}
-        <div
-          className="animate-fade-up"
-          style={{ animationDelay: "80ms" }}
-        >
+        {/* Name — ADAM solid, OSMAN outlined */}
+        <div className="animate-fade-up" style={{ animationDelay: "80ms" }}>
           <h1
-            className="block font-bold text-white"
+            className="block font-bold leading-none"
             style={{
               fontSize: "clamp(3.25rem, 11.5vw, 10rem)",
               letterSpacing: "-0.035em",
-              lineHeight: 0.88,
             }}
           >
-            ADAM
-            <br />
-            OSMAN
+            <span className="block text-white">ADAM</span>
+            <span
+              className="block"
+              style={{
+                WebkitTextStroke: "1.5px rgba(255,255,255,0.45)",
+                color: "transparent",
+              }}
+            >
+              OSMAN
+            </span>
           </h1>
+        </div>
+
+        {/* Animated shimmer subtitle */}
+        <div className="animate-fade-up mt-4" style={{ animationDelay: "160ms" }}>
+          <AnimatedGradientText className="text-base font-medium md:text-lg">
+            founder. builder. CS student.
+          </AnimatedGradientText>
         </div>
 
         {/* Thin rule */}
         <div
           className="animate-fade-up mt-8 h-px w-full"
           style={{
-            animationDelay: "160ms",
-            background: "rgba(255,255,255,0.08)",
+            animationDelay: "220ms",
+            background: "rgba(255,255,255,0.07)",
           }}
         />
 
-        {/* Tagline row */}
+        {/* Description + CTAs */}
         <div
           className="animate-fade-up mt-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between"
-          style={{ animationDelay: "240ms" }}
+          style={{ animationDelay: "280ms" }}
         >
-          <div>
-            <span className="text-xs font-medium uppercase tracking-[0.18em] text-violet-400">
-              Founder&nbsp;&nbsp;·&nbsp;&nbsp;Builder&nbsp;&nbsp;·&nbsp;&nbsp;CS Student
-            </span>
-            <p className="mt-2 max-w-sm text-sm leading-relaxed text-zinc-400">
-              Building AI products at the intersection of technology and
-              real-world impact — from helping students navigate syllabi to
-              helping Parkinson&apos;s patients move more confidently.
-            </p>
-          </div>
+          <p className="max-w-sm text-sm leading-relaxed text-zinc-400">
+            Building AI products at the intersection of technology and
+            real-world impact — from helping students navigate syllabi to
+            helping Parkinson&apos;s patients move more confidently.
+          </p>
           <div className="flex shrink-0 gap-3">
             <a
               href="#projects"
@@ -102,8 +119,8 @@ export function Hero() {
 
       {/* Tech stack marquee */}
       <div
-        className="animate-fade-up mt-8 overflow-hidden border-t border-white/[0.06] py-4"
-        style={{ animationDelay: "320ms" }}
+        className="animate-fade-up relative overflow-hidden border-t border-white/[0.06] py-4"
+        style={{ animationDelay: "340ms" }}
       >
         <div className="animate-marquee flex gap-10">
           {marqueeItems.map((tech, i) => (
