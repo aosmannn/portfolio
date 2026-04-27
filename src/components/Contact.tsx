@@ -1,6 +1,7 @@
 import { Mail } from "lucide-react";
+import { Reveal } from "@/components/Reveal";
 
-function GitHubIcon({ size = 24 }: { size?: number }) {
+function GitHubIcon({ size = 20 }: { size?: number }) {
   return (
     <svg
       width={size}
@@ -14,7 +15,7 @@ function GitHubIcon({ size = 24 }: { size?: number }) {
   );
 }
 
-function LinkedInIcon({ size = 24 }: { size?: number }) {
+function LinkedInIcon({ size = 20 }: { size?: number }) {
   return (
     <svg
       width={size}
@@ -48,30 +49,66 @@ const links = [
 
 export function Contact() {
   return (
-    <section id="contact" className="border-t border-zinc-800/60 py-20 pb-32">
-      <div className="mx-auto max-w-5xl px-6 text-center md:px-12">
-        <h2 className="text-3xl font-semibold tracking-tight text-white">
-          Get in touch
-        </h2>
-        <p className="mb-10 mt-3 text-base text-zinc-400">
-          Open to internships, research, and interesting problems.
-        </p>
-        <div className="flex items-center justify-center gap-8">
-          {links.map(({ Icon, href, label }) => (
-            <a
-              key={label}
-              href={href}
-              target={href.startsWith("mailto") ? undefined : "_blank"}
-              rel={
-                href.startsWith("mailto") ? undefined : "noopener noreferrer"
-              }
-              aria-label={label}
-              className="text-zinc-400 transition-colors duration-200 hover:text-violet-400"
-            >
-              <Icon size={24} />
-            </a>
-          ))}
-        </div>
+    <section
+      id="contact"
+      className="border-t border-white/[0.06] py-24 pb-32"
+    >
+      <div className="mx-auto max-w-6xl px-6 md:px-12">
+        <Reveal>
+          <span className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-500">
+            Get in touch
+          </span>
+        </Reveal>
+
+        <Reveal delay={60}>
+          <h2
+            className="mt-6 font-bold tracking-tight text-white"
+            style={{
+              fontSize: "clamp(2.5rem, 6vw, 5rem)",
+              letterSpacing: "-0.03em",
+              lineHeight: 1.05,
+            }}
+          >
+            Let&apos;s build
+            <br />
+            something.
+          </h2>
+        </Reveal>
+
+        <Reveal delay={120}>
+          <p className="mt-6 max-w-md text-base leading-relaxed text-zinc-500">
+            Open to internships, research opportunities, and interesting
+            problems. If you&apos;re building something hard and need a sharp
+            collaborator, reach out.
+          </p>
+        </Reveal>
+
+        <Reveal delay={180}>
+          <div className="mt-10 flex flex-wrap items-center gap-4">
+            {links.map(({ Icon, href, label }) => (
+              <a
+                key={label}
+                href={href}
+                target={href.startsWith("mailto") ? undefined : "_blank"}
+                rel={
+                  href.startsWith("mailto") ? undefined : "noopener noreferrer"
+                }
+                aria-label={label}
+                className="flex items-center gap-2.5 rounded-lg border border-white/[0.08] px-4 py-2.5 text-sm font-medium text-zinc-400 transition-all duration-200 hover:border-violet-500/40 hover:text-violet-300"
+              >
+                <Icon size={16} />
+                {label}
+              </a>
+            ))}
+          </div>
+        </Reveal>
+
+        <Reveal delay={240}>
+          <div className="mt-16 flex items-center justify-between border-t border-white/[0.06] pt-8 text-xs text-zinc-700">
+            <span>Adam Osman</span>
+            <span>© {new Date().getFullYear()}</span>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
