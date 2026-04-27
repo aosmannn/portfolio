@@ -29,6 +29,29 @@ html {
   will-change: transform;
 }
 
+/* Shimmer gradient — used by AnimatedGradientText */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Dot grid for hero background */
+.dot-grid {
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.045) 1px,
+    transparent 1px
+  );
+  background-size: 26px 26px;
+}
+
 /* Hero load animations */
 @keyframes fade-up {
   from {

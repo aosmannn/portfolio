@@ -32,7 +32,7 @@ function LinkedInIcon({ size = 20 }: { size?: number }) {
 const links = [
   {
     Icon: GitHubIcon,
-    href: "https://github.com/aosmann",
+    href: "https://github.com/aosmannn",
     label: "GitHub",
   },
   {
