@@ -20,8 +20,8 @@ export const projects: Project[] = [
     description:
       "iOS + watchOS app that monitors gait via Apple Watch and delivers rhythmic haptic cueing for Parkinson's patients to improve movement confidence.",
     stack: ["Swift", "SwiftUI", "HealthKit", "WatchConnectivity"],
-    href: "#",
-    status: "coming-soon",
+    href: "https://github.com/aosmannn/GAITGUARD",
+    status: "open-source",
   },
   {
     title: "PlanDrop",

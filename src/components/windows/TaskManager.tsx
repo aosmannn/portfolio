@@ -161,7 +161,7 @@ export default function TaskManager() {
             {[
               ['OS', 'Windows 7 (adamosman.dev edition)'],
               ['Runtime', 'Next.js 16 + React 19'],
-              ['Uptime', 'since conception (19 years)'],
+              ['Uptime', 'Apr 2024 — Present'],
               ['Developer', 'Adam Osman — Georgia State University'],
               ['Status', '🟢 Available for hire'],
             ].map(([k, v]) => (

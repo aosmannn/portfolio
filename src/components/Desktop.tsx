@@ -212,9 +212,7 @@ export default function Desktop() {
       </div>
 
       {/* Calendar */}
-      <div style={{ position: 'fixed', bottom: 50, right: 20, zIndex: 50 }}>
-        <CalendarWidget />
-      </div>
+      <CalendarWidget />
 
       {/* Weather */}
       <WeatherWidget />
