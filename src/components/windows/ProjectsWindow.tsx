@@ -49,7 +49,7 @@ export default function ProjectsWindow({ onOpenProject }: ProjectsWindowProps) {
   useEffect(() => {
     if (tab === 'github' && repos.length === 0) {
       setLoading(true);
-      fetch('https://api.github.com/users/aosmannn/repos?sort=updated&per_page=30')
+      fetch('/api/github-repos')
         .then((r) => r.json())
         .then((data: GHRepo[]) => {
           setRepos(data.filter((r) => !r.fork && r.name !== 'portfolio'));

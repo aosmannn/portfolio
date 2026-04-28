@@ -13,10 +13,10 @@ const SKILLS = [
 ];
 
 const TIMELINE = [
-  { period: '2025–Present', title: 'Founder & CEO, CourseConnect AI', desc: 'AI-powered syllabus reader for college students' },
-  { period: '2024–Present', title: 'CS + Business Student, Georgia State University', desc: '' },
-  { period: '2024',         title: 'Built GaitGuard AI', desc: 'iOS/watchOS gait monitoring app for Parkinson\'s patients' },
-  { period: '2023',         title: 'Started coding', desc: 'First project: a Python calculator' },
+  { period: '2026–Present', title: 'GaitGuard', desc: 'iOS/watchOS gait monitoring app for Parkinson\'s patients — uses Apple Watch motion sensors to deliver rhythmic haptic cues that help users initiate walking and navigate turns' },
+  { period: '2025–Present', title: 'Founder & CEO, CourseConnect AI', desc: 'AI-powered study platform that reads course syllabi, extracts deadlines and grading policies, and provides context-aware tutoring — helping college students outperform rather than just study' },
+  { period: '2024–Present', title: 'CS Student, Georgia State University', desc: '' },
+  { period: '2025',         title: 'PlanDrop', desc: 'Friend-group activity planner where your crew claims a pre-generated plan from a live pool of AI-curated options in your area — first come, first served' },
 ];
 
 export default function SkillsWindow() {

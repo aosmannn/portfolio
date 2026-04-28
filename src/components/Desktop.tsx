@@ -73,7 +73,7 @@ export default function Desktop() {
   const [wins, setWins] = useState<Record<WinId, WinState>>(() => {
     const init: Record<string, WinState> = {};
     for (const id of Object.keys(WIN_CONFIG)) init[id] = { open: false, minimized: false };
-    init['music'] = { open: true, minimized: false };
+    init['music'] = { open: false, minimized: false };
     return init as Record<WinId, WinState>;
   });
 
