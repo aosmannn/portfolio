@@ -58,6 +58,17 @@ html, body { margin: 0; padding: 0; font-family: Tahoma, 'Trebuchet MS', Arial, 
 ::-webkit-scrollbar-track { background: #c8c8c8; border: 1px solid #888; }
 ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #e8e8e8 0%, #c0c0c0 50%, #a8a8a8 100%); border: 1px solid #888; }
 
+@keyframes virusShake {
+  0%,100% { transform: translate(0,0) rotate(0deg); }
+  25% { transform: translate(-3px,2px) rotate(-1deg); }
+  75% { transform: translate(3px,-2px) rotate(1deg); }
+}
+.virus-shake { animation: virusShake 0.25s infinite !important; }
+
+@keyframes redFlicker {
+  0%,100% { opacity:0; } 25%,75% { opacity:0.5; } 50% { opacity:0.1; }
+}
+
 /* Bubbles */
 @keyframes float-up { 0% { transform: translateY(100vh) scale(0.5); opacity: 0; } 10% { opacity: 0.6; } 90% { opacity: 0.3; } 100% { transform: translateY(-100px) scale(1.2); opacity: 0; } }
 .bubble { position: absolute; border-radius: 50%; background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.8) 0%, rgba(180,220,255,0.4) 40%, rgba(100,180,255,0.2) 70%, rgba(60,140,255,0.1) 100%); border: 1px solid rgba(180,220,255,0.6); box-shadow: inset 0 0 20px rgba(255,255,255,0.3); animation: float-up linear infinite; pointer-events: none; }

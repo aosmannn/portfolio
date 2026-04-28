@@ -2,6 +2,12 @@
 
 import { useEffect, useState, useRef } from 'react';
 
+type ShowFn = (msg: string, persist?: boolean) => void;
+let _clippyShow: ShowFn | null = null;
+export function triggerClippyMessage(msg: string, persist = false) {
+  _clippyShow?.(msg, persist);
+}
+
 const MESSAGES = [
   "It looks like you're viewing a portfolio. Want me to annoy you about it?",
   "Have you considered hiring Adam? Just a thought. I'm not biased.",
@@ -43,6 +49,18 @@ export default function Clippy() {
     // Then every 60-90s
     const interval = setInterval(showMessage, 75000);
     return () => { clearTimeout(first); clearInterval(interval); };
+  }, []);
+
+  useEffect(() => {
+    _clippyShow = (msg, persist) => {
+      setMsg(msg);
+      setVisible(true);
+      setWaving(true);
+      setTimeout(() => setWaving(false), 1000);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (!persist) timeoutRef.current = setTimeout(() => setVisible(false), 8000);
+    };
+    return () => { _clippyShow = null; };
   }, []);
 
   const dismiss = () => {

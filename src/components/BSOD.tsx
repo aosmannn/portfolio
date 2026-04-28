@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 
 interface BSODProps {
   onDismiss: () => void;
+  stopCode?: string;
 }
 
-export default function BSOD({ onDismiss }: BSODProps) {
+export default function BSOD({ onDismiss, stopCode }: BSODProps) {
   const [progress, setProgress] = useState(0);
   const [done, setDone] = useState(false);
 
@@ -75,7 +76,7 @@ export default function BSOD({ onDismiss }: BSODProps) {
             <span style={{ textDecoration: 'underline' }}>https://adamosman.dev</span>
             <br/><br/>
             If you call a support person, give them this info:<br/>
-            Stop code: <strong>RECRUITER_NOT_HIRING_FAST_ENOUGH</strong>
+            Stop code: <strong>{stopCode ?? 'RECRUITER_NOT_HIRING_FAST_ENOUGH'}</strong>
           </div>
         </div>
 

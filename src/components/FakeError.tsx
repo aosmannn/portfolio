@@ -14,7 +14,11 @@ function randomBetween(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export default function FakeError() {
+interface FakeErrorProps {
+  forceShow?: boolean;
+}
+
+export default function FakeError({ forceShow }: FakeErrorProps = {}) {
   const [visible, setVisible] = useState(false);
   const [msg, setMsg] = useState('');
   const [pos, setPos] = useState({ x: 300, y: 200 });
@@ -22,6 +26,15 @@ export default function FakeError() {
   const [dragPos, setDragPos] = useState({ x: 300, y: 200 });
 
   useEffect(() => {
+    if (forceShow) {
+      const x = randomBetween(100, Math.max(200, window.innerWidth - 380));
+      const y = randomBetween(80, Math.max(150, window.innerHeight - 200));
+      setMsg(MESSAGES[randomBetween(0, MESSAGES.length - 1)]);
+      setPos({ x, y });
+      setDragPos({ x, y });
+      setVisible(true);
+      return;
+    }
     const schedule = () => {
       const delay = randomBetween(3 * 60 * 1000, 5 * 60 * 1000);
       return setTimeout(() => {
@@ -35,7 +48,7 @@ export default function FakeError() {
     };
     const t = schedule();
     return () => clearTimeout(t);
-  }, [visible]);
+  }, [visible, forceShow]);
 
   useEffect(() => {
     if (!visible) return;

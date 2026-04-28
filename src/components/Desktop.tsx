@@ -30,6 +30,8 @@ import CmdWindow from './windows/CmdWindow';
 import FakeError from './FakeError';
 import BootScreen from './BootScreen';
 import { sounds } from '@/lib/sounds';
+import { triggerClippyMessage } from './Clippy';
+import { showToast } from '@/lib/toast';
 
 type WinId = 'about' | 'projects' | 'contact' | 'resume' | 'music' | 'blog' | 'bin' | 'history' | 'tasks' | 'snip' | 'skills' | 'cmd';
 
@@ -83,6 +85,10 @@ export default function Desktop() {
   const [showBSOD, setShowBSOD] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [addNoteSignal, setAddNoteSignal] = useState(0);
+  const [virusShake, setVirusShake] = useState(false);
+  const [redFlicker, setRedFlicker] = useState(false);
+  const [virusErrors, setVirusErrors] = useState(0);
+  const [bsodCode, setBsodCode] = useState('RECRUITER_NOT_HIRING_FAST_ENOUGH');
 
   const openWindow = (id: WinId) => {
     sounds.open();
@@ -142,6 +148,27 @@ export default function Desktop() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
+  // Clippy virus easter egg
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (sessionStorage.getItem('clippy-virus-done')) return;
+    sessionStorage.setItem('clippy-virus-done', '1');
+    const ts: ReturnType<typeof setTimeout>[] = [];
+    const at = (ms: number, fn: () => void) => ts.push(setTimeout(fn, ms));
+
+    at(45000, () => triggerClippyMessage("It looks like you're browsing without antivirus. Installing one now...", true));
+    at(47500, () => showToast({ title: '🛡️ antivirus.exe', body: 'Installing... ██████████ 100%' }));
+    at(50000, () => showToast({ title: '✅ antivirus.exe', body: 'Protection enabled! Your PC is safe.' }));
+    at(53000, () => triggerClippyMessage('⚠️ Scan complete. 1,337 threats found. Removing now...', true));
+    at(56000, () => setVirusShake(true));
+    at(57000, () => setVirusErrors(5));
+    at(59000, () => { setRedFlicker(true); setTimeout(() => setRedFlicker(false), 1500); });
+    at(61000, () => triggerClippyMessage('Oops.', true));
+    at(63000, () => { setVirusShake(false); setBsodCode('CLIPPY_BETRAYAL_EXCEPTION'); setShowBSOD(true); });
+
+    return () => ts.forEach(clearTimeout);
+  }, []);
+
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     setCtxMenu({ x: e.clientX, y: e.clientY });
@@ -152,8 +179,6 @@ export default function Desktop() {
     open: wins[id].open, minimized: wins[id].minimized,
   }));
 
-  if (showBSOD) return <BSOD onDismiss={() => setShowBSOD(false)} />;
-
   return (
     <>
     {!booted && (
@@ -161,9 +186,11 @@ export default function Desktop() {
         <BootScreen onComplete={() => { localStorage.setItem('booted', '1'); setBooted(true); }} />
       </div>
     )}
+    {showBSOD && <BSOD onDismiss={() => { setShowBSOD(false); setBsodCode('RECRUITER_NOT_HIRING_FAST_ENOUGH'); }} stopCode={bsodCode} />}
     <div className="desktop" onContextMenu={handleContextMenu} onClick={() => setCtxMenu(null)}>
 
       {/* Desktop Icons */}
+      <div className={virusShake ? 'virus-shake' : ''}>
       {DESKTOP_ICONS.map(icon => (
         <DesktopIcon key={icon.id} label={icon.label} emoji={icon.emoji}
           defaultX={icon.x} defaultY={icon.y}
@@ -182,6 +209,7 @@ export default function Desktop() {
         defaultX={10} defaultY={380}
         onDoubleClick={() => setAddNoteSignal(s => s + 1)}
       />
+      </div>
 
       {/* Calendar */}
       <div style={{ position: 'fixed', bottom: 50, right: 20, zIndex: 50 }}>
@@ -249,6 +277,9 @@ export default function Desktop() {
       <KonamiCode />
       <Clippy />
       <FakeError />
+      {Array.from({ length: virusErrors }).map((_, i) => (
+        <FakeError key={`virus-err-${i}`} forceShow />
+      ))}
 
       {/* Screensaver + Toast */}
       <Screensaver />
@@ -261,6 +292,7 @@ export default function Desktop() {
         onMusicClick={() => openWindow('music')}
         onSearchClick={() => setShowSearch(true)}
       />
+      {redFlicker && <div style={{ position:'fixed', inset:0, zIndex:99990, pointerEvents:'none', background:'rgba(255,0,0,0.4)', animation:'redFlicker 1.5s ease-in-out' }} />}
     </div>
     </>
   );
