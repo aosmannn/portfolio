@@ -30,14 +30,22 @@ const MESSAGES = [
 
 const isAntivirusMsg = (msg: string) => msg.toLowerCase().includes('antivirus');
 
+interface ChatEntry { role: 'clippy' | 'user'; text: string; }
+const HISTORY_KEY = 'clippy-chat-history';
+
 export default function Clippy() {
   const [visible, setVisible] = useState(false);
   const [msg, setMsg] = useState('');
   const [waving, setWaving] = useState(false);
   const [inputText, setInputText] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
+  const [history, setHistory] = useState<ChatEntry[]>(() => {
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) ?? '[]'); } catch { return []; }
+  });
+  const [showHistory, setShowHistory] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const historyEndRef = useRef<HTMLDivElement>(null);
 
   const showMessage = (text?: string, persist = false) => {
     const m = text ?? MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
@@ -84,12 +92,23 @@ export default function Clippy() {
     _virusCallback?.();
   };
 
+  const addToHistory = (entries: ChatEntry[]) => {
+    setHistory(prev => {
+      const next = [...prev, ...entries].slice(-40);
+      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+      return next;
+    });
+    setTimeout(() => historyEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+  };
+
   const handleAskSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const question = inputText.trim();
     if (!question || aiLoading) return;
     setAiLoading(true);
     setMsg('...');
+    setInputText('');
+    addToHistory([{ role: 'user', text: question }]);
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     try {
       const res = await fetch('/api/clippy-chat', {
@@ -98,14 +117,15 @@ export default function Clippy() {
         body: JSON.stringify({ message: question }),
       });
       const data = await res.json();
-      setMsg(data.reply ?? "I'm having trouble thinking right now.");
+      const reply = data.reply ?? "I'm having trouble thinking right now.";
+      setMsg(reply);
+      addToHistory([{ role: 'clippy', text: reply }]);
       timeoutRef.current = setTimeout(() => setVisible(false), 10000);
     } catch {
       setMsg("I'm having trouble thinking right now.");
       timeoutRef.current = setTimeout(() => setVisible(false), 6000);
     } finally {
       setAiLoading(false);
-      setInputText('');
     }
   };
 
@@ -116,18 +136,38 @@ export default function Clippy() {
       {/* Speech bubble */}
       {visible && (
         <div style={{
-          position: 'absolute', bottom: 90, right: 0,
-          width: 240,
+          position: 'absolute', bottom: 105, right: 0,
+          width: 290,
           background: 'rgba(255,255,220,0.97)',
           border: '1px solid #cca',
           borderRadius: 6,
-          padding: '8px 10px 8px 10px',
+          padding: '10px 12px',
           boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
           fontFamily: 'Tahoma, sans-serif',
-          fontSize: 11,
+          fontSize: 12,
           color: '#222',
           lineHeight: 1.5,
         }}>
+          {/* History toggle */}
+          {history.length > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <button onClick={() => setShowHistory(h => !h)} style={{ fontSize: 9, padding: '1px 6px', cursor: 'pointer', background: 'rgba(0,0,0,0.08)', border: '1px solid #cca', borderRadius: 3, fontFamily: 'Tahoma, sans-serif', color: '#554' }}>
+                {showHistory ? '▼ Hide history' : '▲ Chat history'}
+              </button>
+              {showHistory && <button onClick={() => { setHistory([]); localStorage.removeItem(HISTORY_KEY); }} style={{ fontSize: 9, padding: '1px 6px', cursor: 'pointer', background: 'transparent', border: 'none', color: '#a00', fontFamily: 'Tahoma, sans-serif' }}>Clear</button>}
+            </div>
+          )}
+          {/* Chat history */}
+          {showHistory && history.length > 0 && (
+            <div style={{ maxHeight: 160, overflowY: 'auto', marginBottom: 8, borderTop: '1px solid #ddc', paddingTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {history.map((entry, i) => (
+                <div key={i} style={{ fontSize: 10, padding: '3px 6px', borderRadius: 3, background: entry.role === 'user' ? 'rgba(0,120,215,0.1)' : 'rgba(255,220,0,0.15)', alignSelf: entry.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '85%', color: '#333', border: `1px solid ${entry.role === 'user' ? 'rgba(0,120,215,0.2)' : 'rgba(200,180,0,0.3)'}` }}>
+                  {entry.text}
+                </div>
+              ))}
+              <div ref={historyEndRef} />
+            </div>
+          )}
           <div style={{ marginBottom: showAntivirus ? 8 : 0 }}>{msg}</div>
 
           {/* Antivirus Yes/No buttons */}

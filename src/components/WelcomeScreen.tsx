@@ -78,20 +78,17 @@ export default function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
             onMouseLeave={() => setHovered(false)}
             style={{
               width: 100, height: 100, borderRadius: 4,
-              background: hovered
-                ? 'linear-gradient(135deg, #2a80ff 0%, #1050c0 100%)'
-                : 'linear-gradient(135deg, #1a60e0 0%, #0a3890 100%)',
               border: hovered ? '2px solid rgba(255,255,255,0.9)' : '2px solid rgba(255,255,255,0.5)',
               boxShadow: hovered
                 ? '0 0 0 3px rgba(100,160,255,0.4), 0 8px 30px rgba(0,0,0,0.5)'
                 : '0 4px 20px rgba(0,0,0,0.5)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 52, cursor: 'pointer',
+              cursor: 'pointer', overflow: 'hidden',
               transition: 'all 0.2s ease',
               transform: hovered ? 'scale(1.03)' : 'scale(1)',
             }}
           >
-            🧑‍💻
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/adam.jpeg" alt="Adam Osman" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
           </div>
 
           {/* Name */}
