@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const SKILLS = [
   { label: 'React / Next.js', pct: 90 },
@@ -19,24 +19,131 @@ const TIMELINE = [
   { period: '2025',         title: 'PlanDrop', desc: 'Friend-group activity planner where your crew claims a pre-generated plan from a live pool of AI-curated options in your area — first come, first served' },
 ];
 
+interface WakaLang { name: string; percent: number; text: string; }
+interface WakaEditor { name: string; percent: number; text: string; }
+interface WakaData {
+  data?: {
+    human_readable_total?: string;
+    languages?: WakaLang[];
+    editors?: WakaEditor[];
+  };
+}
+
+function WakaStats() {
+  const [data, setData] = useState<WakaData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/wakatime')
+      .then(r => r.json())
+      .then(json => {
+        if (json?.data) setData(json);
+        else setFailed(true);
+      })
+      .catch(() => setFailed(true))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return <div style={{ padding: 24, textAlign: 'center', color: '#888', fontSize: 12 }}>Loading coding stats...</div>;
+  }
+
+  if (failed || !data?.data) {
+    return (
+      <div style={{ padding: 20, textAlign: 'center' }}>
+        <div style={{ fontSize: 24, marginBottom: 8 }}>⏱️</div>
+        <div style={{ fontSize: 12, color: '#666' }}>No data yet — install WakaTime in your editor!</div>
+      </div>
+    );
+  }
+
+  const { human_readable_total, languages = [], editors = [] } = data.data;
+  const topLangs = languages.slice(0, 5);
+  const topEditors = editors.slice(0, 3);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* Total time */}
+      <div style={{ background: '#fff', border: '1px solid #d0e8f8', borderRadius: 6, padding: '12px 16px', boxShadow: '0 1px 4px rgba(0,120,215,0.08)' }}>
+        <div style={{ fontSize: 10, color: '#0078d7', fontWeight: 'bold', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>This Week</div>
+        <div style={{ fontSize: 20, fontWeight: 'bold', color: '#003380' }}>{human_readable_total ?? '—'}</div>
+        <div style={{ fontSize: 10, color: '#888', marginTop: 2 }}>total coding time</div>
+      </div>
+
+      {/* Languages */}
+      {topLangs.length > 0 && (
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 'bold', color: '#333', marginBottom: 10, textTransform: 'uppercase', letterSpacing: 0.5 }}>Top Languages</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {topLangs.map(lang => (
+              <div key={lang.name}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3, fontSize: 11, color: '#333' }}>
+                  <span style={{ fontWeight: 'bold' }}>{lang.name}</span>
+                  <span style={{ color: '#0078d7' }}>{lang.percent.toFixed(1)}%</span>
+                </div>
+                <div style={{ height: 14, background: '#d4e8f8', borderRadius: 3, border: '1px solid #a8d0f0', overflow: 'hidden' }}>
+                  <div style={{
+                    width: `${lang.percent}%`, height: '100%',
+                    background: 'linear-gradient(180deg, #56b4f7 0%, #0078d7 40%, #005fa3 60%, #1e8ef5 100%)',
+                    borderRadius: 2,
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4)',
+                    transition: 'width 0.6s ease',
+                  }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Editors */}
+      {topEditors.length > 0 && (
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 'bold', color: '#333', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>Top Editors</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {topEditors.map(editor => (
+              <div key={editor.name} style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                background: '#fff', border: '1px solid #d0e8f8', borderRadius: 4,
+                padding: '6px 12px', fontSize: 11,
+              }}>
+                <span style={{ fontWeight: 'bold', color: '#222' }}>{editor.name}</span>
+                <span style={{ color: '#0078d7' }}>{editor.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function SkillsWindow() {
-  const [tab, setTab] = useState<'skills' | 'experience'>('skills');
+  const [tab, setTab] = useState<'skills' | 'experience' | 'coding'>('skills');
+
+  const tabs: { id: typeof tab; label: string }[] = [
+    { id: 'skills', label: 'Skills' },
+    { id: 'experience', label: 'Experience' },
+    { id: 'coding', label: '⏱️ Coding Stats' },
+  ];
 
   return (
     <div style={{ fontFamily: 'Tahoma, sans-serif', height: '100%', display: 'flex', flexDirection: 'column', background: '#f0f0f0' }}>
       {/* Tabs */}
       <div style={{ display: 'flex', borderBottom: '2px solid #0078d7', background: '#e8e8e8', flexShrink: 0 }}>
-        {(['skills', 'experience'] as const).map(t => (
-          <button key={t} onClick={() => setTab(t)} style={{
-            padding: '6px 20px', border: 'none', cursor: 'pointer', fontSize: 12,
-            background: tab === t ? '#ffffff' : 'transparent',
-            color: tab === t ? '#0078d7' : '#333',
-            fontWeight: tab === t ? 'bold' : 'normal',
+        {tabs.map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)} style={{
+            padding: '6px 16px', border: 'none', cursor: 'pointer', fontSize: 12,
+            background: tab === t.id ? '#ffffff' : 'transparent',
+            color: tab === t.id ? '#0078d7' : '#333',
+            fontWeight: tab === t.id ? 'bold' : 'normal',
             fontFamily: 'Tahoma, sans-serif',
-            borderBottom: tab === t ? '2px solid #ffffff' : 'none',
-            marginBottom: tab === t ? -2 : 0,
+            borderBottom: tab === t.id ? '2px solid #ffffff' : 'none',
+            marginBottom: tab === t.id ? -2 : 0,
+            whiteSpace: 'nowrap',
           }}>
-            {t === 'skills' ? 'Skills' : 'Experience'}
+            {t.label}
           </button>
         ))}
       </div>
@@ -97,6 +204,8 @@ export default function SkillsWindow() {
             ))}
           </div>
         )}
+
+        {tab === 'coding' && <WakaStats />}
       </div>
     </div>
   );

@@ -3,16 +3,8 @@ export default function AboutWindow() {
     <div className="win-content">
       {/* Avatar */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 16 }}>
-        <div style={{
-          width: 72, height: 72, borderRadius: '50%',
-          background: 'linear-gradient(135deg, #4488ff 0%, #0044cc 100%)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 36, flexShrink: 0,
-          border: '3px solid #8ab8f0',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-        }}>
-          🧑‍💻
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/adam.jpeg" alt="Adam Osman" style={{ width: 100, height: 100, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center top', border: '2px solid rgba(100,140,220,0.4)', flexShrink: 0 }} />
         <div>
           <div style={{ fontSize: 18, fontWeight: 'bold', color: '#003380' }}>Adam Osman</div>
           <div style={{ fontSize: 12, color: '#666', marginTop: 2 }}>CS Student &amp; Founder</div>

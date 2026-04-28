@@ -27,13 +27,14 @@ import TaskManager from './windows/TaskManager';
 import SnippingTool from './windows/SnippingTool';
 import SkillsWindow from './windows/SkillsWindow';
 import CmdWindow from './windows/CmdWindow';
+import GitHubWindow from './windows/GitHubWindow';
 import FakeError from './FakeError';
 import BootScreen from './BootScreen';
 import { sounds } from '@/lib/sounds';
-import { triggerClippyMessage } from './Clippy';
+import { triggerClippyMessage, setVirusCallback } from './Clippy';
 import { showToast } from '@/lib/toast';
 
-type WinId = 'about' | 'projects' | 'contact' | 'resume' | 'music' | 'blog' | 'bin' | 'history' | 'tasks' | 'snip' | 'skills' | 'cmd';
+type WinId = 'about' | 'projects' | 'contact' | 'resume' | 'music' | 'blog' | 'bin' | 'history' | 'tasks' | 'snip' | 'skills' | 'cmd' | 'github';
 
 interface WinState { open: boolean; minimized: boolean; }
 
@@ -50,6 +51,7 @@ const WIN_CONFIG: Record<WinId, { title: string; icon: string; defaultPosition: 
   snip:    { title: 'Snipping Tool',    icon: '✂️', defaultPosition: { x: 200, y: 140 }, defaultSize: { width: 360, height: 260 } },
   skills:  { title: 'Skills & XP',     icon: '🏆', defaultPosition: { x: 200, y: 80  }, defaultSize: { width: 500, height: 420 } },
   cmd:     { title: 'Command Prompt',  icon: '🖥️', defaultPosition: { x: 220, y: 100 }, defaultSize: { width: 520, height: 360 } },
+  github:  { title: 'GitHub Activity', icon: '🐙', defaultPosition: { x: 180, y: 80  }, defaultSize: { width: 520, height: 400 } },
 };
 
 const DESKTOP_ICONS: { id: WinId; label: string; emoji: string; x: number; y: number }[] = [
@@ -62,6 +64,7 @@ const DESKTOP_ICONS: { id: WinId; label: string; emoji: string; x: number; y: nu
   { id: 'tasks',    label: 'Task Mgr',    emoji: '⚙️', x: 10,  y: 290 },
   { id: 'skills',   label: 'Skills',      emoji: '🏆', x: 100, y: 380 },
   { id: 'cmd',      label: 'cmd.exe',     emoji: '🖥️', x: 100, y: 470 },
+  { id: 'github',   label: 'GitHub',      emoji: '🐙', x: 100, y: 560 },
 ];
 
 interface CtxMenu { x: number; y: number; }
@@ -152,21 +155,32 @@ export default function Desktop() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (sessionStorage.getItem('clippy-virus-done')) return;
-    sessionStorage.setItem('clippy-virus-done', '1');
-    const ts: ReturnType<typeof setTimeout>[] = [];
-    const at = (ms: number, fn: () => void) => ts.push(setTimeout(fn, ms));
 
-    at(45000, () => triggerClippyMessage("It looks like you're browsing without antivirus. Installing one now...", true));
-    at(47500, () => showToast({ title: '🛡️ antivirus.exe', body: 'Installing... ██████████ 100%' }));
-    at(50000, () => showToast({ title: '✅ antivirus.exe', body: 'Protection enabled! Your PC is safe.' }));
-    at(53000, () => triggerClippyMessage('⚠️ Scan complete. 1,337 threats found. Removing now...', true));
-    at(56000, () => setVirusShake(true));
-    at(57000, () => setVirusErrors(5));
-    at(59000, () => { setRedFlicker(true); setTimeout(() => setRedFlicker(false), 1500); });
-    at(61000, () => triggerClippyMessage('Oops.', true));
-    at(63000, () => { setVirusShake(false); setVirusErrors(0); setBsodCode('CLIPPY_BETRAYAL_EXCEPTION'); setShowBSOD(true); });
+    const runVirusSequence = () => {
+      sessionStorage.setItem('clippy-virus-done', '1');
+      const ts: ReturnType<typeof setTimeout>[] = [];
+      const at = (ms: number, fn: () => void) => ts.push(setTimeout(fn, ms));
+      at(0,     () => showToast({ title: '🛡️ antivirus.exe', body: 'Installing... ██████████ 100%' }));
+      at(2500,  () => showToast({ title: '✅ antivirus.exe', body: 'Protection enabled! Your PC is safe.' }));
+      at(5500,  () => triggerClippyMessage('⚠️ Scan complete. 1,337 threats found. Removing now...', true));
+      at(8500,  () => setVirusShake(true));
+      at(9500,  () => setVirusErrors(5));
+      at(11500, () => { setRedFlicker(true); setTimeout(() => setRedFlicker(false), 1500); });
+      at(13500, () => triggerClippyMessage('Oops.', true));
+      at(15500, () => { setVirusShake(false); setVirusErrors(0); setBsodCode('CLIPPY_BETRAYAL_EXCEPTION'); setShowBSOD(true); });
+    };
 
-    return () => ts.forEach(clearTimeout);
+    setVirusCallback(runVirusSequence);
+
+    // Show antivirus prompt after 20s
+    const t = setTimeout(() => {
+      if (!sessionStorage.getItem('clippy-virus-done')) {
+        triggerClippyMessage("It looks like you're browsing without antivirus. Should I install one?", true);
+      }
+    }, 20000);
+
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleContextMenu = (e: React.MouseEvent) => {
@@ -246,6 +260,7 @@ export default function Desktop() {
             {id === 'snip'     && <SnippingTool onClose={() => closeWindow('snip')} />}
             {id === 'skills'   && <SkillsWindow />}
             {id === 'cmd'      && <CmdWindow />}
+            {id === 'github'   && <GitHubWindow />}
           </Window>
         );
       })}
