@@ -33,22 +33,22 @@ export default function FakeError({ forceShow }: FakeErrorProps = {}) {
       setPos({ x, y });
       setDragPos({ x, y });
       setVisible(true);
-      return;
+      // Auto-dismiss after 4s
+      const t = setTimeout(() => setVisible(false), 4000);
+      return () => clearTimeout(t);
     }
-    const schedule = () => {
-      const delay = randomBetween(3 * 60 * 1000, 5 * 60 * 1000);
-      return setTimeout(() => {
-        const x = randomBetween(100, Math.max(200, window.innerWidth - 380));
-        const y = randomBetween(80, Math.max(150, window.innerHeight - 200));
-        setMsg(MESSAGES[randomBetween(0, MESSAGES.length - 1)]);
-        setPos({ x, y });
-        setDragPos({ x, y });
-        setVisible(true);
-      }, delay);
-    };
-    const t = schedule();
+    const delay = randomBetween(3 * 60 * 1000, 5 * 60 * 1000);
+    const t = setTimeout(() => {
+      const x = randomBetween(100, Math.max(200, window.innerWidth - 380));
+      const y = randomBetween(80, Math.max(150, window.innerHeight - 200));
+      setMsg(MESSAGES[randomBetween(0, MESSAGES.length - 1)]);
+      setPos({ x, y });
+      setDragPos({ x, y });
+      setVisible(true);
+    }, delay);
     return () => clearTimeout(t);
-  }, [visible, forceShow]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [forceShow]);
 
   useEffect(() => {
     if (!visible) return;

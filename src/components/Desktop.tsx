@@ -164,7 +164,7 @@ export default function Desktop() {
     at(57000, () => setVirusErrors(5));
     at(59000, () => { setRedFlicker(true); setTimeout(() => setRedFlicker(false), 1500); });
     at(61000, () => triggerClippyMessage('Oops.', true));
-    at(63000, () => { setVirusShake(false); setBsodCode('CLIPPY_BETRAYAL_EXCEPTION'); setShowBSOD(true); });
+    at(63000, () => { setVirusShake(false); setVirusErrors(0); setBsodCode('CLIPPY_BETRAYAL_EXCEPTION'); setShowBSOD(true); });
 
     return () => ts.forEach(clearTimeout);
   }, []);
