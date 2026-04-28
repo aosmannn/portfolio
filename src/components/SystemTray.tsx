@@ -111,7 +111,7 @@ function VolumePopup({ volume, muted, onChange, onToggleMute }: {
           style={{
             writingMode: 'vertical-lr',
             direction: 'rtl',
-            appearance: 'slider-vertical',
+            appearance: 'slider-vertical' as unknown as React.CSSProperties['appearance'],
             WebkitAppearance: 'slider-vertical',
             width: 8,
             height: 80,
