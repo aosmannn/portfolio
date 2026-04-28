@@ -136,7 +136,7 @@ export default function Clippy() {
       {/* Speech bubble */}
       {visible && (
         <div style={{
-          position: 'absolute', bottom: 105, right: 0,
+          position: 'absolute', bottom: 0, right: 130,
           width: 290,
           background: 'rgba(255,255,220,0.97)',
           border: '1px solid #cca',
@@ -242,11 +242,11 @@ export default function Clippy() {
 
           {/* Triangle pointer */}
           <div style={{
-            position: 'absolute', bottom: -8, right: 30,
+            position: 'absolute', right: -8, bottom: 20,
             width: 0, height: 0,
-            borderLeft: '8px solid transparent',
-            borderRight: '8px solid transparent',
-            borderTop: '8px solid rgba(255,255,220,0.97)',
+            borderTop: '8px solid transparent',
+            borderBottom: '8px solid transparent',
+            borderLeft: '8px solid rgba(255,255,220,0.97)',
           }} />
         </div>
       )}
@@ -263,7 +263,7 @@ export default function Clippy() {
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/clippy.png" alt="Clippy" style={{ width: 90, height: 'auto', display: 'block' }} />
+        <img src="/clippy.png" alt="Clippy" style={{ width: 120, height: 'auto', display: 'block' }} />
       </div>
     </div>
   );

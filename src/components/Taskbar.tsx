@@ -69,7 +69,10 @@ export default function Taskbar({ windows, onWindowClick, onMusicClick, onSearch
           onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.15)')}
           onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.07)')}
         >
-          🔍 <span>Search</span>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
+            <circle cx="5.5" cy="5.5" r="4.5" stroke="rgba(255,255,255,0.85)" strokeWidth="1.5" fill="none"/>
+            <line x1="9" y1="9" x2="13" y2="13" stroke="rgba(255,255,255,0.85)" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg> <span>Search</span>
         </button>
       )}
 

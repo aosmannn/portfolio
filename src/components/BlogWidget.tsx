@@ -13,8 +13,8 @@ interface Post {
 export default function BlogWidget({ onOpen }: { onOpen: () => void }) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [pos, setPos] = useState(() => ({
-    x: 100,
-    y: typeof window !== 'undefined' ? window.innerHeight - 200 : 500,
+    x: 200,
+    y: 8,
   }));
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
