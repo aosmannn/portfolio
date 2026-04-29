@@ -26,7 +26,7 @@ export default function ResumeWindow() {
       {/* PDF Viewer */}
       <div style={{ flex: 1, border: '1px solid #c0c8d8', borderRadius: 2, overflow: 'hidden', background: '#525659' }}>
         <iframe
-          src="/adam-osman.pdf#toolbar=0&navpanes=0&scrollbar=1"
+          src="https://docs.google.com/viewer?url=https://adamosman.dev/adam-osman.pdf&embedded=true"
           style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
           title="Adam Osman Resume"
         />
