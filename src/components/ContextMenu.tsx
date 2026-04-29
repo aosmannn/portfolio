@@ -17,9 +17,10 @@ interface ContextMenuProps {
   onOpenAbout: () => void;
   onBSOD?: () => void;
   onStickyNote?: () => void;
+  onPersonalize?: () => void;
 }
 
-export default function ContextMenu({ x, y, onClose, onOpenAbout, onBSOD, onStickyNote }: ContextMenuProps) {
+export default function ContextMenu({ x, y, onClose, onOpenAbout, onBSOD, onStickyNote, onPersonalize }: ContextMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export default function ContextMenu({ x, y, onClose, onOpenAbout, onBSOD, onStic
   }, [onClose]);
 
   // Clamp to viewport
-  const menuW = 200, menuH = 280;
+  const menuW = 200, menuH = 310;
   const cx = typeof window !== 'undefined' ? Math.min(x, window.innerWidth - menuW - 8) : x;
   const cy = typeof window !== 'undefined' ? Math.min(y, window.innerHeight - menuH - 48) : y;
 
@@ -45,6 +46,7 @@ export default function ContextMenu({ x, y, onClose, onOpenAbout, onBSOD, onStic
     { label: '📝  New Blog Post', action: () => window.open('/admin', '_blank') },
     { label: '👤  GitHub Profile', action: () => window.open('https://github.com/aosmannn', '_blank') },
     { divider: true },
+    { label: '🎨  Personalize', action: () => { onPersonalize?.(); onClose(); } },
     { label: 'ℹ️  About Windows 7', action: () => { onOpenAbout(); onClose(); } },
     { label: '💀  Force BSOD', action: () => { onBSOD?.(); } },
   ];

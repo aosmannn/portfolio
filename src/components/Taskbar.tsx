@@ -17,9 +17,18 @@ interface TaskbarProps {
   onWindowClick: (id: string) => void;
   onMusicClick: () => void;
   onSearchClick?: () => void;
+  onOpenWindow?: (id: string) => void;
 }
 
-export default function Taskbar({ windows, onWindowClick, onMusicClick, onSearchClick }: TaskbarProps) {
+const PINNED_APPS = [
+  { id: 'explorer', icon: '📁', title: 'Windows Explorer' },
+  { id: 'ie',       icon: '🌐', title: 'Internet Explorer' },
+  { id: 'paint',    icon: '🎨', title: 'Paint' },
+  { id: 'notepad',  icon: '📝', title: 'Notepad' },
+  { id: 'calc',     icon: '🧮', title: 'Calculator' },
+];
+
+export default function Taskbar({ windows, onWindowClick, onMusicClick, onSearchClick, onOpenWindow }: TaskbarProps) {
   const [time, setTime] = useState('');
   const [date, setDate] = useState('');
 
@@ -75,6 +84,36 @@ export default function Taskbar({ windows, onWindowClick, onMusicClick, onSearch
           </svg> <span>Search</span>
         </button>
       )}
+
+      {/* Pinned apps */}
+      {PINNED_APPS.map(app => (
+        <button
+          key={app.id}
+          title={app.title}
+          onClick={() => onOpenWindow?.(app.id)}
+          style={{
+            width: 36, height: 36,
+            background: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 4,
+            fontSize: 18,
+            cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+            transition: 'background 0.15s, box-shadow 0.15s',
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = 'rgba(100,160,255,0.25)';
+            e.currentTarget.style.boxShadow = '0 0 8px rgba(100,180,255,0.5), inset 0 0 0 1px rgba(255,255,255,0.2)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
+        >
+          {app.icon}
+        </button>
+      ))}
 
       {/* Separator */}
       <div style={{ width: 1, height: 28, background: 'rgba(255,255,255,0.2)', margin: '0 2px', flexShrink: 0 }} />

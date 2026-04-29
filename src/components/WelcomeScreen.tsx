@@ -7,6 +7,7 @@ export default function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
   const [time, setTime] = useState('');
   const [date, setDate] = useState('');
   const [hovered, setHovered] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
     function tick() {
@@ -42,15 +43,57 @@ export default function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.15)', pointerEvents: 'none' }} />
 
       {/* Clock — top right */}
-      <div style={{
-        position: 'absolute', top: 48, right: 64,
-        textAlign: 'right', color: 'white',
-        textShadow: '0 2px 12px rgba(0,0,0,0.8)',
-        zIndex: 2,
-      }}>
+      <div
+        onClick={() => setShowNotifications(v => !v)}
+        style={{
+          position: 'absolute', top: 48, right: 64,
+          textAlign: 'right', color: 'white',
+          textShadow: '0 2px 12px rgba(0,0,0,0.8)',
+          zIndex: 2, cursor: 'pointer',
+          userSelect: 'none',
+        }}
+      >
         <div style={{ fontSize: 72, fontWeight: 200, letterSpacing: -3, lineHeight: 1 }}>{time}</div>
         <div style={{ fontSize: 18, fontWeight: 300, marginTop: 6, opacity: 0.9 }}>{date}</div>
       </div>
+
+      {/* Notification panel */}
+      {showNotifications && (
+        <div style={{
+          position: 'absolute', top: 200, right: 64,
+          background: 'rgba(20,30,60,0.85)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255,255,255,0.15)',
+          borderRadius: 6,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+          padding: '16px 20px',
+          minWidth: 240,
+          color: 'white',
+          zIndex: 3,
+          fontFamily: 'Segoe UI, Tahoma, sans-serif',
+        }}>
+          <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: 8 }}>
+            🔔 Notifications
+          </div>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginBottom: 16 }}>
+            No new notifications
+          </div>
+          <button
+            onClick={() => setShowNotifications(false)}
+            style={{
+              fontFamily: 'Segoe UI, Tahoma, sans-serif',
+              fontSize: 11, padding: '4px 14px',
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: 3, color: 'white',
+              cursor: 'pointer',
+            }}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Center: glass login panel */}
       <div style={{
@@ -60,13 +103,13 @@ export default function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
       }}>
         <div style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0,
-          padding: '40px 60px 32px',
-          background: 'rgba(255,255,255,0.06)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255,255,255,0.12)',
-          borderRadius: 4,
-          boxShadow: '0 8px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1)',
+          padding: '48px 72px 36px',
+          background: 'rgba(255,255,255,0.10)',
+          backdropFilter: 'blur(40px)',
+          WebkitBackdropFilter: 'blur(40px)',
+          border: '1px solid rgba(255,255,255,0.18)',
+          borderRadius: 6,
+          boxShadow: '0 16px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.15), inset 0 0 40px rgba(255,255,255,0.04)',
         }}>
           {/* Avatar */}
           <div
@@ -106,6 +149,42 @@ export default function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
             marginTop: 4, fontStyle: 'italic',
           }}>
             {hovered ? 'Logging on...' : 'Click to log on'}
+          </div>
+
+          {/* Password row */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 6, marginTop: 16,
+          }}>
+            <input
+              type="password"
+              value="password"
+              readOnly
+              style={{
+                fontFamily: 'Segoe UI, Tahoma, sans-serif',
+                fontSize: 14, letterSpacing: 4,
+                padding: '5px 10px', width: 180,
+                background: 'rgba(255,255,255,0.15)',
+                border: '1px solid rgba(255,255,255,0.3)',
+                borderRadius: 2,
+                color: 'white', outline: 'none',
+                backdropFilter: 'blur(4px)',
+              }}
+            />
+            {/* Blue arrow button */}
+            <button
+              onClick={handleClick}
+              style={{
+                width: 30, height: 30,
+                background: 'linear-gradient(180deg, #4499ee 0%, #0055cc 100%)',
+                border: '1px solid rgba(0,80,180,0.8)',
+                borderRadius: 3, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 2px 6px rgba(0,60,160,0.5), inset 0 1px 0 rgba(255,255,255,0.3)',
+                color: 'white', fontSize: 14,
+              }}
+            >
+              ▶
+            </button>
           </div>
 
           {/* Divider */}
