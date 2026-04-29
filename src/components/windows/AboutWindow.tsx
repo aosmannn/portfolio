@@ -26,7 +26,7 @@ export default function AboutWindow() {
       <ul style={{ paddingLeft: 18, lineHeight: 2, marginBottom: 12 }}>
         <li>Building <strong>CourseConnect AI</strong> — AI syllabus reader for college students</li>
         <li>Studying CS at Georgia State University</li>
-        <li>Exploring iOS/watchOS development with <strong>GaitGuard AI</strong></li>
+        <li>Exploring iOS/watchOS development with <strong>GaitGuard</strong></li>
         <li>Open-sourcing <strong>PlanDrop</strong> for friend-group activity planning</li>
       </ul>
 
