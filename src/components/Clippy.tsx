@@ -120,7 +120,7 @@ export default function Clippy() {
       const reply = data.reply ?? "I'm having trouble thinking right now.";
       setMsg(reply);
       addToHistory([{ role: 'clippy', text: reply }]);
-      timeoutRef.current = setTimeout(() => setVisible(false), 10000);
+      timeoutRef.current = setTimeout(() => setVisible(false), 20000);
     } catch {
       setMsg("I'm having trouble thinking right now.");
       timeoutRef.current = setTimeout(() => setVisible(false), 6000);
@@ -250,6 +250,33 @@ export default function Clippy() {
           }} />
         </div>
       )}
+
+      {/* Persistent Chat button — always visible */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4 }}>
+        <button
+          onClick={() => {
+            if (!visible) {
+              setMsg('');
+              setVisible(true);
+              setInputText('');
+              if (timeoutRef.current) clearTimeout(timeoutRef.current);
+              setTimeout(() => inputRef.current?.focus(), 50);
+            } else {
+              setTimeout(() => inputRef.current?.focus(), 50);
+            }
+          }}
+          style={{
+            fontSize: 10, padding: '3px 10px',
+            background: 'rgba(255,255,220,0.92)',
+            border: '1px solid #cca', borderRadius: 10,
+            fontFamily: 'Tahoma, sans-serif', color: '#554',
+            cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          💬 Chat with Clippy
+        </button>
+      </div>
 
       {/* Clippy body - clickable */}
       <div
