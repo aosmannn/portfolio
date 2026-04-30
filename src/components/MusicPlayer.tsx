@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { showToast } from '@/lib/toast';
 import { addTrack } from '@/lib/playlistHistory';
+import { triggerClippyMessage } from '@/components/Clippy';
 
 interface NowPlayingData {
   isPlaying: boolean;
@@ -68,10 +69,11 @@ export default function MusicPlayer() {
         lastTrackRef.current = trackId;
         showToast({
           title: '🎵 Now Playing',
-          body: `${json.title} — ${json.artist ?? 'Unknown'}`,
+          body: `${json.title} — ${json.artist ?? 'Unknown'} · Open Music Player for lyrics`,
           icon: json.albumArt,
         });
         addTrack({ title: json.title, artist: json.artist ?? 'Unknown', albumArt: json.albumArt });
+        triggerClippyMessage(`🎵 Now playing: "${json.title}" by ${json.artist ?? 'Unknown'}. Open the Music Player on the taskbar to follow along with lyrics!`);
         // Clear lyrics immediately on skip
         setLyrics(LYRICS_LOADING);
         setLyricIdx(-1);
@@ -201,12 +203,39 @@ export default function MusicPlayer() {
     <div className="media-player" style={{ overflow: 'hidden' }}>
       {/* Track info row */}
       <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', flexShrink: 0 }}>
-        {data.albumArt ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={data.albumArt} alt="album" style={{ width: 64, height: 64, borderRadius: 3, border: '1px solid #204080', flexShrink: 0, boxShadow: '0 0 8px rgba(0,170,255,0.3)' }} />
-        ) : (
-          <div style={{ width: 64, height: 64, borderRadius: 3, border: '1px solid #204080', background: '#101030', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>🎵</div>
-        )}
+        {/* Vinyl record */}
+        <div style={{
+          width: 64, height: 64, borderRadius: '50%', flexShrink: 0, position: 'relative',
+          background: 'radial-gradient(circle at 50% 50%, #1a1a1a 0%, #1a1a1a 28%, #111 29%, #222 31%, #111 33%, #222 35%, #111 37%, #222 39%, #111 41%, #222 43%, #111 45%, #1a1a1a 46%, #1a1a1a 100%)',
+          boxShadow: '0 0 12px rgba(0,170,255,0.4), inset 0 0 8px rgba(0,0,0,0.8)',
+          border: '1px solid #333',
+          animation: 'vinylSpin 2.4s linear infinite',
+          animationPlayState: data.isPlaying ? 'running' : 'paused',
+        }}>
+          <style>{`@keyframes vinylSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+          {/* Center label */}
+          <div style={{
+            position: 'absolute', top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 28, height: 28, borderRadius: '50%', overflow: 'hidden',
+            border: '2px solid #444',
+            boxShadow: '0 0 4px rgba(0,0,0,0.8)',
+          }}>
+            {data.albumArt ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={data.albumArt} alt="album" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <div style={{ width: '100%', height: '100%', background: '#222', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>🎵</div>
+            )}
+          </div>
+          {/* Spindle hole */}
+          <div style={{
+            position: 'absolute', top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 4, height: 4, borderRadius: '50%',
+            background: '#000', border: '1px solid #555',
+          }} />
+        </div>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
           <div style={{ color: '#80e0ff', fontSize: 11, fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.title ?? 'Unknown'}</div>
           <div style={{ color: '#4090a0', fontSize: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.artist ?? 'Unknown'}</div>
