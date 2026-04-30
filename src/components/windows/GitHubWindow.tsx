@@ -7,7 +7,8 @@ interface GitHubEvent {
   type: string;
   repo: { name: string };
   payload: {
-    commits?: { length: number }[];
+    commits?: unknown[];
+    size?: number;
     ref?: string;
     ref_type?: string;
     action?: string;
@@ -28,7 +29,7 @@ function describeEvent(event: GitHubEvent): { icon: string; text: string } | nul
   const repo = event.repo.name.replace('aosmannn/', '');
   switch (event.type) {
     case 'PushEvent': {
-      const count = event.payload.commits?.length ?? 0;
+      const count = event.payload.size ?? event.payload.commits?.length ?? 0;
       return { icon: '📦', text: `Pushed ${count} commit${count !== 1 ? 's' : ''} to ${repo}` };
     }
     case 'CreateEvent':

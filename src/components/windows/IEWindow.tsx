@@ -1,6 +1,19 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 export default function IEWindow() {
+  const [visitorCount, setVisitorCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch('/api/visitor-count')
+      .then(r => r.json())
+      .then(data => setVisitorCount(data.count))
+      .catch(() => setVisitorCount(1337));
+  }, []);
+
+  const displayCount = visitorCount !== null ? visitorCount.toLocaleString() : '...';
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', fontFamily: 'Tahoma, sans-serif', background: '#f0f0f0' }}>
       {/* IE Toolbar */}
@@ -90,10 +103,10 @@ export default function IEWindow() {
               fontSize: 18, padding: '4px 16px',
               border: '2px inset #888',
             }}>
-              1337
+              {visitorCount !== null ? visitorCount : '...'}
             </div>
             <div style={{ fontSize: 11, color: '#666', marginTop: 2 }}>
-              You are visitor #1,337! Congratulations!
+              You are visitor #{displayCount}! Congratulations!
             </div>
           </div>
 
@@ -124,10 +137,6 @@ export default function IEWindow() {
             My Skillz 💻
           </h2>
           <ul style={{ fontSize: 13, lineHeight: 2 }}>
-            <li>✅ React.js (the best JavaScript)</li>
-            <li>✅ Next.js (even more JavaScript)</li>
-            <li>✅ TypeScript (JavaScript but with more yelling)</li>
-            <li>✅ Python (the snake language)</li>
             <li>✅ Making websites that look like this one</li>
             <li>✅ Founder of CourseConnect AI (it is on the internet)</li>
             <li>✅ Georgia State University student (very prestigious)</li>
