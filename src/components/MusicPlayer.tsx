@@ -207,127 +207,97 @@ export default function MusicPlayer() {
     );
   }
 
+  const vinylSize = showLyrics ? 64 : 160;
+  const labelSize = showLyrics ? 28 : 70;
+
+  const ArtDisplay = ({ size, label }: { size: number; label: number }) => useVinyl ? (
+    <div style={{
+      width: size, height: size, borderRadius: '50%', flexShrink: 0, position: 'relative',
+      background: 'radial-gradient(circle at 50% 50%, #1a1a1a 0%, #1a1a1a 28%, #111 29%, #222 31%, #111 33%, #222 35%, #111 37%, #222 39%, #111 41%, #222 43%, #111 45%, #1a1a1a 46%, #1a1a1a 100%)',
+      boxShadow: '0 0 16px rgba(0,170,255,0.4), inset 0 0 8px rgba(0,0,0,0.8)',
+      border: '1px solid #333',
+      animation: 'vinylSpin 2.4s linear infinite',
+      animationPlayState: data.isPlaying ? 'running' : 'paused',
+    }}>
+      <style>{`@keyframes vinylSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: label, height: label, borderRadius: '50%', overflow: 'hidden', border: '2px solid #444', boxShadow: '0 0 4px rgba(0,0,0,0.8)' }}>
+        {data.albumArt
+          ? <img src={data.albumArt} alt="album" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> // eslint-disable-line @next/next/no-img-element
+          : <div style={{ width: '100%', height: '100%', background: '#222', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size / 6 }}>🎵</div>}
+      </div>
+      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 4, height: 4, borderRadius: '50%', background: '#000', border: '1px solid #555' }} />
+    </div>
+  ) : (
+    data.albumArt
+      ? <img src={data.albumArt} alt="album" style={{ width: size, height: size, borderRadius: showLyrics ? 3 : 8, border: '1px solid #204080', flexShrink: 0, boxShadow: '0 0 12px rgba(0,170,255,0.3)', objectFit: 'cover' }} /> // eslint-disable-line @next/next/no-img-element
+      : <div style={{ width: size, height: size, borderRadius: showLyrics ? 3 : 8, border: '1px solid #204080', background: '#101030', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size / 2.5 }}>🎵</div>
+  );
+
   return (
     <div className="media-player" style={{ overflow: 'hidden' }}>
       {/* Toggle controls */}
       <div style={{ display: 'flex', gap: 4, flexShrink: 0, justifyContent: 'flex-end' }}>
-        <button
-          onClick={() => setUseVinyl(v => !v)}
-          title={useVinyl ? 'Switch to album art' : 'Switch to vinyl'}
-          style={{
-            fontSize: 9, padding: '2px 6px', cursor: 'pointer', borderRadius: 3,
-            background: useVinyl ? 'rgba(0,170,255,0.25)' : 'rgba(255,255,255,0.06)',
-            border: `1px solid ${useVinyl ? '#00aaff' : 'rgba(100,160,200,0.3)'}`,
-            color: useVinyl ? '#00aaff' : '#4090a0',
-            fontFamily: 'Tahoma, sans-serif', transition: 'all 0.15s',
-          }}
-        >
+        <button onClick={() => setUseVinyl(v => !v)} style={{ fontSize: 9, padding: '2px 6px', cursor: 'pointer', borderRadius: 3, background: useVinyl ? 'rgba(0,170,255,0.25)' : 'rgba(255,255,255,0.06)', border: `1px solid ${useVinyl ? '#00aaff' : 'rgba(100,160,200,0.3)'}`, color: useVinyl ? '#00aaff' : '#4090a0', fontFamily: 'Tahoma, sans-serif' }}>
           {useVinyl ? '💿 Vinyl' : '🖼 Album'}
         </button>
-        <button
-          onClick={() => setShowLyrics(l => !l)}
-          title={showLyrics ? 'Hide lyrics' : 'Show lyrics'}
-          style={{
-            fontSize: 9, padding: '2px 6px', cursor: 'pointer', borderRadius: 3,
-            background: showLyrics ? 'rgba(0,170,255,0.25)' : 'rgba(255,255,255,0.06)',
-            border: `1px solid ${showLyrics ? '#00aaff' : 'rgba(100,160,200,0.3)'}`,
-            color: showLyrics ? '#00aaff' : '#4090a0',
-            fontFamily: 'Tahoma, sans-serif', transition: 'all 0.15s',
-          }}
-        >
+        <button onClick={() => setShowLyrics(l => !l)} style={{ fontSize: 9, padding: '2px 6px', cursor: 'pointer', borderRadius: 3, background: showLyrics ? 'rgba(0,170,255,0.25)' : 'rgba(255,255,255,0.06)', border: `1px solid ${showLyrics ? '#00aaff' : 'rgba(100,160,200,0.3)'}`, color: showLyrics ? '#00aaff' : '#4090a0', fontFamily: 'Tahoma, sans-serif' }}>
           {showLyrics ? '🎤 Lyrics On' : '🎤 Lyrics Off'}
         </button>
       </div>
 
-      {/* Track info row */}
-      <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', flexShrink: 0 }}>
-        {/* Album art or vinyl */}
-        {useVinyl ? (
-          <div style={{
-            width: 64, height: 64, borderRadius: '50%', flexShrink: 0, position: 'relative',
-            background: 'radial-gradient(circle at 50% 50%, #1a1a1a 0%, #1a1a1a 28%, #111 29%, #222 31%, #111 33%, #222 35%, #111 37%, #222 39%, #111 41%, #222 43%, #111 45%, #1a1a1a 46%, #1a1a1a 100%)',
-            boxShadow: '0 0 12px rgba(0,170,255,0.4), inset 0 0 8px rgba(0,0,0,0.8)',
-            border: '1px solid #333',
-            animation: 'vinylSpin 2.4s linear infinite',
-            animationPlayState: data.isPlaying ? 'running' : 'paused',
-          }}>
-            <style>{`@keyframes vinylSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
-            <div style={{
-              position: 'absolute', top: '50%', left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: 28, height: 28, borderRadius: '50%', overflow: 'hidden',
-              border: '2px solid #444', boxShadow: '0 0 4px rgba(0,0,0,0.8)',
-            }}>
-              {data.albumArt ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={data.albumArt} alt="album" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              ) : (
-                <div style={{ width: '100%', height: '100%', background: '#222', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>🎵</div>
-              )}
+      {showLyrics ? (
+        /* LYRICS MODE — small art left, track info right */
+        <>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', flexShrink: 0 }}>
+            <ArtDisplay size={vinylSize} label={labelSize} />
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <div style={{ color: '#80e0ff', fontSize: 11, fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.title ?? 'Unknown'}</div>
+              <div style={{ color: '#4090a0', fontSize: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.artist ?? 'Unknown'}</div>
+              <div className="now-playing-bars" style={{ marginTop: 2 }}>
+                <div className="bar bar-1" /><div className="bar bar-2" /><div className="bar bar-3" />
+              </div>
             </div>
-            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 4, height: 4, borderRadius: '50%', background: '#000', border: '1px solid #555' }} />
           </div>
-        ) : (
-          data.albumArt ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={data.albumArt} alt="album" style={{ width: 64, height: 64, borderRadius: 3, border: '1px solid #204080', flexShrink: 0, boxShadow: '0 0 8px rgba(0,170,255,0.3)' }} />
-          ) : (
-            <div style={{ width: 64, height: 64, borderRadius: 3, border: '1px solid #204080', background: '#101030', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>🎵</div>
-          )
-        )}
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <div style={{ color: '#80e0ff', fontSize: 11, fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.title ?? 'Unknown'}</div>
-          <div style={{ color: '#4090a0', fontSize: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.artist ?? 'Unknown'}</div>
-          <div className="now-playing-bars" style={{ marginTop: 2 }}>
-            <div className="bar bar-1" style={{ animationPlayState: 'running' }} />
-            <div className="bar bar-2" style={{ animationPlayState: 'running' }} />
-            <div className="bar bar-3" style={{ animationPlayState: 'running' }} />
+          {/* Lyrics */}
+          <div style={{ flex: 1, overflow: 'hidden', position: 'relative', minHeight: 0 }}>
+            {lyricsLoading ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(100,160,200,0.5)', fontSize: 10, fontStyle: 'italic' }}>Loading lyrics...</div>
+            ) : isNoneLyrics ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 6 }}>
+                <div style={{ fontSize: 20, opacity: 0.4 }}>🎤</div>
+                <div style={{ color: 'rgba(100,150,180,0.6)', fontSize: 10, fontStyle: 'italic' }}>No lyrics for this song</div>
+              </div>
+            ) : hasLyrics ? (
+              <>
+                <div ref={lyricContainerRef} style={{ height: '100%', overflowY: 'auto', padding: '4px 0', scrollbarWidth: 'none' }}>
+                  {lyrics.map((line, i) => {
+                    const isActive = i === lyricIdx, isPast = i < lyricIdx;
+                    return (
+                      <div key={i} style={{ textAlign: 'center', padding: '4px 10px', fontSize: isActive ? 12 : 10, fontWeight: isActive ? 'bold' : 'normal', color: isActive ? '#ffffff' : isPast ? 'rgba(120,180,220,0.4)' : 'rgba(140,190,230,0.55)', background: isActive ? 'linear-gradient(90deg, transparent, rgba(0,170,255,0.2), transparent)' : 'transparent', borderLeft: isActive ? '3px solid #00aaff' : '3px solid transparent', transition: 'all 0.25s ease', lineHeight: 1.6, transform: isActive ? 'scale(1.03)' : 'scale(1)', textShadow: isActive ? '0 0 14px rgba(0,200,255,0.7)' : 'none', borderRadius: 3 }}>
+                        {line.text}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 20, background: 'linear-gradient(180deg, rgba(8,16,40,0.95) 0%, transparent 100%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 20, background: 'linear-gradient(0deg, rgba(8,16,40,0.95) 0%, transparent 100%)', pointerEvents: 'none' }} />
+              </>
+            ) : null}
+          </div>
+        </>
+      ) : (
+        /* NO-LYRICS MODE — big centered art + track info below */
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, minHeight: 0 }}>
+          <ArtDisplay size={vinylSize} label={labelSize} />
+          <div style={{ textAlign: 'center', minWidth: 0, width: '100%', padding: '0 8px' }}>
+            <div style={{ color: '#80e0ff', fontSize: 13, fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.title ?? 'Unknown'}</div>
+            <div style={{ color: '#4090a0', fontSize: 11, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 2 }}>{data.artist ?? 'Unknown'}</div>
+            <div className="now-playing-bars" style={{ marginTop: 6, justifyContent: 'center' }}>
+              <div className="bar bar-1" /><div className="bar bar-2" /><div className="bar bar-3" />
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Lyrics area */}
-      <div style={{ flex: 1, overflow: 'hidden', position: 'relative', minHeight: 0, display: showLyrics ? undefined : 'none' }}>
-        {lyricsLoading ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(100,160,200,0.5)', fontSize: 10, fontStyle: 'italic' }}>
-            Loading lyrics...
-          </div>
-        ) : isNoneLyrics ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 6 }}>
-            <div style={{ fontSize: 20, opacity: 0.4 }}>🎤</div>
-            <div style={{ color: 'rgba(100,150,180,0.6)', fontSize: 10, fontStyle: 'italic' }}>No lyrics for this song</div>
-          </div>
-        ) : hasLyrics ? (
-          <>
-            <div ref={lyricContainerRef} style={{ height: '100%', overflowY: 'auto', padding: '4px 0', scrollbarWidth: 'none' }}>
-              {lyrics.map((line, i) => {
-                const isActive = i === lyricIdx;
-                const isPast = i < lyricIdx;
-                return (
-                  <div key={i} style={{
-                    textAlign: 'center',
-                    padding: '4px 10px',
-                    fontSize: isActive ? 12 : 10,
-                    fontWeight: isActive ? 'bold' : 'normal',
-                    color: isActive ? '#ffffff' : isPast ? 'rgba(120,180,220,0.4)' : 'rgba(140,190,230,0.55)',
-                    background: isActive ? 'linear-gradient(90deg, transparent, rgba(0,170,255,0.2), transparent)' : 'transparent',
-                    borderLeft: isActive ? '3px solid #00aaff' : '3px solid transparent',
-                    transition: 'all 0.25s ease',
-                    lineHeight: 1.6,
-                    transform: isActive ? 'scale(1.03)' : 'scale(1)',
-                    textShadow: isActive ? '0 0 14px rgba(0,200,255,0.7)' : 'none',
-                    borderRadius: 3,
-                  }}>
-                    {line.text}
-                  </div>
-                );
-              })}
-            </div>
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 20, background: 'linear-gradient(180deg, rgba(8,16,40,0.95) 0%, transparent 100%)', pointerEvents: 'none' }} />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 20, background: 'linear-gradient(0deg, rgba(8,16,40,0.95) 0%, transparent 100%)', pointerEvents: 'none' }} />
-          </>
-        ) : null}
-      </div>
+      )}
 
       {/* Progress bar */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flexShrink: 0 }}>
