@@ -1,9 +1,39 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { showToast } from '@/lib/toast';
 import { addTrack } from '@/lib/playlistHistory';
 import { triggerClippyMessage } from '@/components/Clippy';
+
+// Extract dominant colors from album art via canvas
+function useAlbumColors(albumArt?: string): string[] {
+  const [colors, setColors] = useState(['#0066cc', '#00ccaa', '#6600cc']);
+  useEffect(() => {
+    if (!albumArt) return;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 20; canvas.height = 20;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, 20, 20);
+        const d = ctx.getImageData(0, 0, 20, 20).data;
+        // Sample 4 corners + center for dominant colors
+        const spots = [[0,0],[19,0],[0,19],[19,19],[10,10],[5,5],[15,15],[5,15],[15,5]];
+        const sampled = spots.map(([x,y]) => {
+          const i = (y * 20 + x) * 4;
+          return `rgb(${d[i]},${d[i+1]},${d[i+2]})`;
+        });
+        // Pick 3 visually distinct ones (just spread them out)
+        setColors([sampled[0], sampled[4], sampled[8]]);
+      } catch { /* CORS blocked — keep defaults */ }
+    };
+    img.src = albumArt;
+  }, [albumArt]);
+  return colors;
+}
 
 interface NowPlayingData {
   isPlaying: boolean;
@@ -89,8 +119,9 @@ export default function MusicPlayer() {
   const lastTrackRef = useRef('');
   const lyricContainerRef = useRef<HTMLDivElement>(null);
   const dataRef = useRef<NowPlayingData | null>(null);
+  const colors = useAlbumColors(data?.albumArt);
 
-  const fetchLyrics = async (track: NowPlayingData) => {
+  const fetchLyrics = useCallback(async (track: NowPlayingData) => {
     if (!track.title || !track.artist) { setLyrics(LYRICS_NONE); setLyricsLoading(false); return; }
     try {
       const p = new URLSearchParams({ track_name: track.title, artist_name: track.artist, ...(track.album ? { album_name: track.album } : {}), ...(track.duration ? { duration: String(Math.round(track.duration / 1000)) } : {}) });
@@ -106,7 +137,8 @@ export default function MusicPlayer() {
       } else { setLyrics(LYRICS_NONE); }
     } catch { setLyrics(LYRICS_NONE); }
     setLyricsLoading(false);
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchNowPlaying = async () => {
     try {
@@ -225,13 +257,20 @@ export default function MusicPlayer() {
 
   return (
     <div className="media-player" style={{ overflow: 'hidden', position: 'relative' }}>
-      {/* Blurred album art background */}
-      {data.albumArt && (
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', borderRadius: 'inherit' }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={data.albumArt} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(24px) brightness(0.18) saturate(1.5)', transform: 'scale(1.1)' }} />
-        </div>
-      )}
+      {/* Animated ambient background — Ken Burns + color orbs */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', borderRadius: 'inherit', background: '#04080f', pointerEvents: 'none' }}>
+        {/* Ken Burns album art */}
+        {data.albumArt && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={data.albumArt} alt="" className="album-ken-burns" style={{ position: 'absolute', inset: '-10%', width: '120%', height: '120%', objectFit: 'cover', filter: 'blur(28px) brightness(0.15) saturate(2)', }} />
+        )}
+        {/* Floating color orbs */}
+        <div className="orb orb-1" style={{ background: colors[0] }} />
+        <div className="orb orb-2" style={{ background: colors[1] }} />
+        <div className="orb orb-3" style={{ background: colors[2] }} />
+        {/* Dark vignette overlay */}
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, transparent 30%, rgba(2,5,15,0.7) 100%)' }} />
+      </div>
       {/* Content above background */}
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%', gap: 6, overflow: 'hidden' }}>
         <Toggles />

@@ -244,3 +244,39 @@ html, body { margin: 0; padding: 0; font-family: Tahoma, 'Trebuchet MS', Arial, 
 .vinyl-disc.vinyl-paused {
   animation-play-state: paused;
 }
+
+/* Music player ambient animations */
+@keyframes kenBurns {
+  0%   { transform: scale(1.1) translate(0%, 0%); }
+  25%  { transform: scale(1.18) translate(-2%, -1.5%); }
+  50%  { transform: scale(1.22) translate(2%, -2%); }
+  75%  { transform: scale(1.16) translate(-1%, 1.5%); }
+  100% { transform: scale(1.1) translate(0%, 0%); }
+}
+@keyframes orbFloat1 {
+  0%   { transform: translate(0%, 0%) scale(1); opacity: 0.35; }
+  33%  { transform: translate(15%, -20%) scale(1.15); opacity: 0.5; }
+  66%  { transform: translate(-10%, 15%) scale(0.9); opacity: 0.3; }
+  100% { transform: translate(0%, 0%) scale(1); opacity: 0.35; }
+}
+@keyframes orbFloat2 {
+  0%   { transform: translate(0%, 0%) scale(1); opacity: 0.3; }
+  33%  { transform: translate(-20%, 10%) scale(1.2); opacity: 0.45; }
+  66%  { transform: translate(15%, -15%) scale(0.85); opacity: 0.35; }
+  100% { transform: translate(0%, 0%) scale(1); opacity: 0.3; }
+}
+@keyframes orbFloat3 {
+  0%   { transform: translate(0%, 0%) scale(1); opacity: 0.25; }
+  50%  { transform: translate(10%, 20%) scale(1.3); opacity: 0.4; }
+  100% { transform: translate(0%, 0%) scale(1); opacity: 0.25; }
+}
+.album-ken-burns { animation: kenBurns 18s ease-in-out infinite; }
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  pointer-events: none;
+}
+.orb-1 { width: 60%; height: 60%; top: -20%; left: -10%; animation: orbFloat1 12s ease-in-out infinite; }
+.orb-2 { width: 55%; height: 55%; bottom: -15%; right: -5%; animation: orbFloat2 15s ease-in-out infinite 2s; }
+.orb-3 { width: 40%; height: 40%; top: 30%; left: 30%; animation: orbFloat3 10s ease-in-out infinite 1s; }
