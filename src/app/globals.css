@@ -236,3 +236,11 @@ html, body { margin: 0; padding: 0; font-family: Tahoma, 'Trebuchet MS', Arial, 
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+.vinyl-disc {
+  animation: vinylSpin 2.4s linear infinite;
+  will-change: transform;
+}
+.vinyl-disc.vinyl-paused {
+  animation-play-state: paused;
+}
