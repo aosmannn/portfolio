@@ -87,6 +87,12 @@ export default function MusicPlayer() {
       dataRef.current = json;
       setData(json);
       setLocalProgress(json.progress ?? 0);
+      if (json.isPlaying && json.title) {
+        // expose to Clippy
+        (window as unknown as Record<string, unknown>).__nowPlaying = { title: json.title, artist: json.artist, album: json.album };
+      } else {
+        (window as unknown as Record<string, unknown>).__nowPlaying = null;
+      }
     } catch {
       // silently ignore
     }

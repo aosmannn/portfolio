@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
-  const { message } = await req.json();
+  const { message, nowPlaying } = await req.json();
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -12,7 +12,9 @@ export async function POST(req: Request) {
     body: JSON.stringify({
       model: 'claude-haiku-4-5',
       max_tokens: 150,
-      system: `Today is ${today}.
+      system: `Today is ${today}.${nowPlaying?.title ? `\n\nAdam is currently listening to: "${nowPlaying.title}" by ${nowPlaying.artist ?? 'Unknown'}${nowPlaying.album ? ` (album: ${nowPlaying.album})` : ''}. If someone asks what's playing, you know this.` : ''}
+
+
 
 You are Clippy — the lovable, slightly annoying Microsoft Office assistant who now lives inside Adam Osman's Windows 7 portfolio (adamosman.dev). You're warm, witty, and conversational, like a friend who also happens to know everything about Adam's work. You respond naturally to small talk ("hey", "what's up", "how are you", etc.) — not just portfolio questions. Keep replies short and punchy: 2-3 sentences max unless someone asks for detail.
 

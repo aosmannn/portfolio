@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useRef } from 'react';
 
+declare global { interface Window { __nowPlaying?: { title: string; artist?: string; album?: string } | null; } }
+
 type ShowFn = (msg: string, persist?: boolean) => void;
 let _clippyShow: ShowFn | null = null;
 export function triggerClippyMessage(msg: string, persist = false) {
@@ -124,7 +126,8 @@ export default function Clippy() {
       const res = await fetch('/api/clippy-chat', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ message: question }),
+        body: JSON.stringify({ message: question, nowPlaying: window.__nowPlaying ?? null }),
+
       });
       const data = await res.json();
       pushClippyMsg(data.reply ?? "I'm having trouble thinking right now.");
