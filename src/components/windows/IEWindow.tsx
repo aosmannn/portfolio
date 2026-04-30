@@ -110,19 +110,14 @@ export default function IEWindow() {
             </div>
           </div>
 
-          {/* Photo placeholder */}
-          <div style={{
+          {/* Profile photo */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/adam.jpeg" alt="Adam Osman" style={{
             float: 'right', margin: '0 0 16px 24px',
             border: '4px ridge #000099',
-            background: '#eeeeff',
             width: 120, height: 120,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'Comic Sans MS, cursive',
-            fontSize: 11, color: '#000099',
-            textAlign: 'center',
-          }}>
-            [Professional<br/>Photo]<br/>Coming Soon!
-          </div>
+            objectFit: 'cover', objectPosition: 'center top',
+          }} />
 
           <h2 style={{ fontFamily: '"Comic Sans MS", cursive', color: '#cc0000', fontSize: 20 }}>
             About Me 😊
