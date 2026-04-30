@@ -23,9 +23,7 @@ interface TaskbarProps {
 const PINNED_APPS = [
   { id: 'explorer', icon: '📁', title: 'Windows Explorer' },
   { id: 'ie',       icon: '🌐', title: 'Internet Explorer' },
-  { id: 'paint',    icon: '🎨', title: 'Paint' },
   { id: 'notepad',  icon: '📝', title: 'Notepad' },
-  { id: 'calc',     icon: '🧮', title: 'Calculator' },
 ];
 
 export default function Taskbar({ windows, onWindowClick, onMusicClick, onSearchClick, onOpenWindow }: TaskbarProps) {

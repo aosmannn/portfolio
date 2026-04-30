@@ -29,9 +29,7 @@ import SkillsWindow from './windows/SkillsWindow';
 import CmdWindow from './windows/CmdWindow';
 import GitHubWindow from './windows/GitHubWindow';
 import IEWindow from './windows/IEWindow';
-import PaintWindow from './windows/PaintWindow';
 import NotepadWindow from './windows/NotepadWindow';
-import CalculatorWindow from './windows/CalculatorWindow';
 import WallpaperPicker from './WallpaperPicker';
 import FakeError from './FakeError';
 import BootScreen from './BootScreen';
@@ -39,7 +37,7 @@ import { sounds } from '@/lib/sounds';
 import { triggerClippyMessage, setVirusCallback } from './Clippy';
 import { showToast } from '@/lib/toast';
 
-type WinId = 'about' | 'projects' | 'contact' | 'resume' | 'music' | 'blog' | 'bin' | 'history' | 'tasks' | 'snip' | 'skills' | 'cmd' | 'github' | 'ie' | 'paint' | 'notepad' | 'calc';
+type WinId = 'about' | 'projects' | 'contact' | 'resume' | 'music' | 'blog' | 'bin' | 'history' | 'tasks' | 'snip' | 'skills' | 'cmd' | 'github' | 'ie' | 'notepad';
 
 interface WinState { open: boolean; minimized: boolean; }
 
@@ -58,9 +56,7 @@ const WIN_CONFIG: Record<WinId, { title: string; icon: string; defaultPosition: 
   cmd:     { title: 'Command Prompt',  icon: '🖥️', defaultPosition: { x: 220, y: 100 }, defaultSize: { width: 520, height: 360 } },
   github:  { title: 'GitHub Activity', icon: '🐙', defaultPosition: { x: 180, y: 80  }, defaultSize: { width: 520, height: 400 } },
   ie:      { title: 'Internet Explorer', icon: '🌐', defaultPosition: { x: 120, y: 60 }, defaultSize: { width: 700, height: 500 } },
-  paint:   { title: 'Paint',           icon: '🎨', defaultPosition: { x: 100, y: 50  }, defaultSize: { width: 700, height: 520 } },
   notepad: { title: 'Notepad',         icon: '📝', defaultPosition: { x: 160, y: 70  }, defaultSize: { width: 520, height: 400 } },
-  calc:    { title: 'Calculator',      icon: '🧮', defaultPosition: { x: 300, y: 120 }, defaultSize: { width: 220, height: 320 } },
 };
 
 const DESKTOP_ICONS: { id: WinId; label: string; emoji: string; x: number; y: number }[] = [
@@ -84,10 +80,8 @@ const CLIPPY_TIPS: Partial<Record<WinId, string>> = {
   skills:   "It looks like you're checking skills. Spoiler: he has them.",
   cmd:      "It looks like you're using Command Prompt. Try typing 'hire adam'.",
   github:   "It looks like you're stalking Adam's GitHub. Same.",
-  paint:    "It looks like you're using Paint. A true artist.",
   ie:       "It looks like you're using Internet Explorer. Bold choice. Very retro.",
   notepad:  "It looks like you're reading README.txt. You're clearly thorough.",
-  calc:     "It looks like you need a calculator. Is this for salary negotiations?",
 };
 
 interface CtxMenu { x: number; y: number; }
@@ -288,9 +282,7 @@ export default function Desktop() {
             {id === 'cmd'      && <CmdWindow />}
             {id === 'github'   && <GitHubWindow />}
             {id === 'ie'       && <IEWindow />}
-            {id === 'paint'    && <PaintWindow />}
             {id === 'notepad'  && <NotepadWindow />}
-            {id === 'calc'     && <CalculatorWindow />}
           </Window>
         );
       })}

@@ -21,11 +21,14 @@ const TIMELINE = [
 
 interface WakaLang { name: string; percent: number; text: string; }
 interface WakaEditor { name: string; percent: number; text: string; }
+interface WakaProject { name: string; percent: number; text: string; }
 interface WakaData {
   data?: {
     human_readable_total?: string;
+    human_readable_daily_average?: string;
     languages?: WakaLang[];
     editors?: WakaEditor[];
+    projects?: WakaProject[];
   };
 }
 
@@ -53,22 +56,32 @@ function WakaStats() {
     return (
       <div style={{ padding: 20, textAlign: 'center' }}>
         <div style={{ fontSize: 24, marginBottom: 8 }}>⏱️</div>
-        <div style={{ fontSize: 12, color: '#666' }}>No data yet — install WakaTime in your editor!</div>
+        <div style={{ fontSize: 13, fontWeight: 'bold', color: '#333', marginBottom: 6 }}>Stats loading... check back soon</div>
+        <div style={{ fontSize: 11, color: '#888' }}>Coding stats are fetched live from WakaTime.</div>
       </div>
     );
   }
 
-  const { human_readable_total, languages = [], editors = [] } = data.data;
+  const { human_readable_total, human_readable_daily_average, languages = [], editors = [], projects = [] } = data.data;
   const topLangs = languages.slice(0, 5);
   const topEditors = editors.slice(0, 3);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* Total time */}
-      <div style={{ background: '#fff', border: '1px solid #d0e8f8', borderRadius: 6, padding: '12px 16px', boxShadow: '0 1px 4px rgba(0,120,215,0.08)' }}>
-        <div style={{ fontSize: 10, color: '#0078d7', fontWeight: 'bold', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>This Week</div>
-        <div style={{ fontSize: 20, fontWeight: 'bold', color: '#003380' }}>{human_readable_total ?? '—'}</div>
-        <div style={{ fontSize: 10, color: '#888', marginTop: 2 }}>total coding time</div>
+      <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ flex: 1, background: '#fff', border: '1px solid #d0e8f8', borderRadius: 6, padding: '12px 16px', boxShadow: '0 1px 4px rgba(0,120,215,0.08)' }}>
+          <div style={{ fontSize: 10, color: '#0078d7', fontWeight: 'bold', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>This Week</div>
+          <div style={{ fontSize: 18, fontWeight: 'bold', color: '#003380' }}>{human_readable_total ?? '—'}</div>
+          <div style={{ fontSize: 10, color: '#888', marginTop: 2 }}>total coding time</div>
+        </div>
+        {human_readable_daily_average && (
+          <div style={{ flex: 1, background: '#fff', border: '1px solid #d0e8f8', borderRadius: 6, padding: '12px 16px', boxShadow: '0 1px 4px rgba(0,120,215,0.08)' }}>
+            <div style={{ fontSize: 10, color: '#0078d7', fontWeight: 'bold', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>Daily Avg</div>
+            <div style={{ fontSize: 18, fontWeight: 'bold', color: '#003380' }}>{human_readable_daily_average}</div>
+            <div style={{ fontSize: 10, color: '#888', marginTop: 2 }}>per day</div>
+          </div>
+        )}
       </div>
 
       {/* Languages */}
@@ -110,6 +123,25 @@ function WakaStats() {
               }}>
                 <span style={{ fontWeight: 'bold', color: '#222' }}>{editor.name}</span>
                 <span style={{ color: '#0078d7' }}>{editor.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Projects */}
+      {projects.slice(0, 5).length > 0 && (
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 'bold', color: '#333', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>Top Projects</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {projects.slice(0, 5).map((proj: WakaProject) => (
+              <div key={proj.name} style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                background: '#fff', border: '1px solid #d0e8f8', borderRadius: 4,
+                padding: '6px 12px', fontSize: 11,
+              }}>
+                <span style={{ fontWeight: 'bold', color: '#222' }}>{proj.name}</span>
+                <span style={{ color: '#0078d7' }}>{proj.text}</span>
               </div>
             ))}
           </div>

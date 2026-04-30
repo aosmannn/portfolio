@@ -8,8 +8,7 @@ interface WallpaperPickerProps {
 
 const WALLPAPERS = [
   { id: '/aero.jpg', label: 'Windows Aero' },
-  { id: '/windows7.jpeg', label: 'Windows 7' },
-  { id: '/fruit.jpeg', label: 'Fruit' },
+  { id: '/fruit.jpeg', label: 'Windows Aero 2' },
 ];
 
 export default function WallpaperPicker({ onClose, onSelect, current }: WallpaperPickerProps) {
