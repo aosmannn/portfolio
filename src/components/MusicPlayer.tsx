@@ -51,6 +51,8 @@ export default function MusicPlayer() {
   const [lyrics, setLyrics] = useState<LyricLine[]>(LYRICS_LOADING);
   const [lyricIdx, setLyricIdx] = useState(-1);
   const [lyricsLoading, setLyricsLoading] = useState(false);
+  const [showLyrics, setShowLyrics] = useState(true);
+  const [useVinyl, setUseVinyl] = useState(true);
 
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastTrackRef = useRef<string>('');
@@ -201,41 +203,72 @@ export default function MusicPlayer() {
 
   return (
     <div className="media-player" style={{ overflow: 'hidden' }}>
+      {/* Toggle controls */}
+      <div style={{ display: 'flex', gap: 4, flexShrink: 0, justifyContent: 'flex-end' }}>
+        <button
+          onClick={() => setUseVinyl(v => !v)}
+          title={useVinyl ? 'Switch to album art' : 'Switch to vinyl'}
+          style={{
+            fontSize: 9, padding: '2px 6px', cursor: 'pointer', borderRadius: 3,
+            background: useVinyl ? 'rgba(0,170,255,0.25)' : 'rgba(255,255,255,0.06)',
+            border: `1px solid ${useVinyl ? '#00aaff' : 'rgba(100,160,200,0.3)'}`,
+            color: useVinyl ? '#00aaff' : '#4090a0',
+            fontFamily: 'Tahoma, sans-serif', transition: 'all 0.15s',
+          }}
+        >
+          {useVinyl ? '💿 Vinyl' : '🖼 Album'}
+        </button>
+        <button
+          onClick={() => setShowLyrics(l => !l)}
+          title={showLyrics ? 'Hide lyrics' : 'Show lyrics'}
+          style={{
+            fontSize: 9, padding: '2px 6px', cursor: 'pointer', borderRadius: 3,
+            background: showLyrics ? 'rgba(0,170,255,0.25)' : 'rgba(255,255,255,0.06)',
+            border: `1px solid ${showLyrics ? '#00aaff' : 'rgba(100,160,200,0.3)'}`,
+            color: showLyrics ? '#00aaff' : '#4090a0',
+            fontFamily: 'Tahoma, sans-serif', transition: 'all 0.15s',
+          }}
+        >
+          {showLyrics ? '🎤 Lyrics On' : '🎤 Lyrics Off'}
+        </button>
+      </div>
+
       {/* Track info row */}
       <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', flexShrink: 0 }}>
-        {/* Vinyl record */}
-        <div style={{
-          width: 64, height: 64, borderRadius: '50%', flexShrink: 0, position: 'relative',
-          background: 'radial-gradient(circle at 50% 50%, #1a1a1a 0%, #1a1a1a 28%, #111 29%, #222 31%, #111 33%, #222 35%, #111 37%, #222 39%, #111 41%, #222 43%, #111 45%, #1a1a1a 46%, #1a1a1a 100%)',
-          boxShadow: '0 0 12px rgba(0,170,255,0.4), inset 0 0 8px rgba(0,0,0,0.8)',
-          border: '1px solid #333',
-          animation: 'vinylSpin 2.4s linear infinite',
-          animationPlayState: data.isPlaying ? 'running' : 'paused',
-        }}>
-          <style>{`@keyframes vinylSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
-          {/* Center label */}
+        {/* Album art or vinyl */}
+        {useVinyl ? (
           <div style={{
-            position: 'absolute', top: '50%', left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 28, height: 28, borderRadius: '50%', overflow: 'hidden',
-            border: '2px solid #444',
-            boxShadow: '0 0 4px rgba(0,0,0,0.8)',
+            width: 64, height: 64, borderRadius: '50%', flexShrink: 0, position: 'relative',
+            background: 'radial-gradient(circle at 50% 50%, #1a1a1a 0%, #1a1a1a 28%, #111 29%, #222 31%, #111 33%, #222 35%, #111 37%, #222 39%, #111 41%, #222 43%, #111 45%, #1a1a1a 46%, #1a1a1a 100%)',
+            boxShadow: '0 0 12px rgba(0,170,255,0.4), inset 0 0 8px rgba(0,0,0,0.8)',
+            border: '1px solid #333',
+            animation: 'vinylSpin 2.4s linear infinite',
+            animationPlayState: data.isPlaying ? 'running' : 'paused',
           }}>
-            {data.albumArt ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={data.albumArt} alt="album" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <div style={{ width: '100%', height: '100%', background: '#222', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>🎵</div>
-            )}
+            <style>{`@keyframes vinylSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+            <div style={{
+              position: 'absolute', top: '50%', left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 28, height: 28, borderRadius: '50%', overflow: 'hidden',
+              border: '2px solid #444', boxShadow: '0 0 4px rgba(0,0,0,0.8)',
+            }}>
+              {data.albumArt ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={data.albumArt} alt="album" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <div style={{ width: '100%', height: '100%', background: '#222', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>🎵</div>
+              )}
+            </div>
+            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 4, height: 4, borderRadius: '50%', background: '#000', border: '1px solid #555' }} />
           </div>
-          {/* Spindle hole */}
-          <div style={{
-            position: 'absolute', top: '50%', left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 4, height: 4, borderRadius: '50%',
-            background: '#000', border: '1px solid #555',
-          }} />
-        </div>
+        ) : (
+          data.albumArt ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={data.albumArt} alt="album" style={{ width: 64, height: 64, borderRadius: 3, border: '1px solid #204080', flexShrink: 0, boxShadow: '0 0 8px rgba(0,170,255,0.3)' }} />
+          ) : (
+            <div style={{ width: 64, height: 64, borderRadius: 3, border: '1px solid #204080', background: '#101030', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>🎵</div>
+          )
+        )}
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
           <div style={{ color: '#80e0ff', fontSize: 11, fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.title ?? 'Unknown'}</div>
           <div style={{ color: '#4090a0', fontSize: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.artist ?? 'Unknown'}</div>
@@ -248,7 +281,7 @@ export default function MusicPlayer() {
       </div>
 
       {/* Lyrics area */}
-      <div style={{ flex: 1, overflow: 'hidden', position: 'relative', minHeight: 0 }}>
+      <div style={{ flex: 1, overflow: 'hidden', position: 'relative', minHeight: 0, display: showLyrics ? undefined : 'none' }}>
         {lyricsLoading ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(100,160,200,0.5)', fontSize: 10, fontStyle: 'italic' }}>
             Loading lyrics...
