@@ -208,7 +208,7 @@ export default function MusicPlayer() {
   }
 
   const vinylSize = showLyrics ? 64 : 160;
-  const labelSize = showLyrics ? 28 : 70;
+  const labelSize = showLyrics ? 26 : 90;
 
   const ArtDisplay = ({ size, label }: { size: number; label: number }) => useVinyl ? (
     <div style={{
@@ -219,8 +219,7 @@ export default function MusicPlayer() {
       animation: 'vinylSpin 2.4s linear infinite',
       animationPlayState: data.isPlaying ? 'running' : 'paused',
     }}>
-      <style>{`@keyframes vinylSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
-      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: label, height: label, borderRadius: '50%', overflow: 'hidden', border: '2px solid #444', boxShadow: '0 0 4px rgba(0,0,0,0.8)' }}>
+      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: label, height: label, borderRadius: '50%', overflow: 'hidden', border: '2px solid #555', boxShadow: '0 0 6px rgba(0,0,0,0.9)' }}>
         {data.albumArt
           ? <img src={data.albumArt} alt="album" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> // eslint-disable-line @next/next/no-img-element
           : <div style={{ width: '100%', height: '100%', background: '#222', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size / 6 }}>🎵</div>}
