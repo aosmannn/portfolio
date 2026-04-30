@@ -3,14 +3,14 @@
 import { useState } from 'react';
 
 const FAKE_FILES = [
-  { name: 'my_feelings.txt', size: '2 KB', deleted: '3/14/2025', type: '📄' },
-  { name: 'old_resume_FINAL_v3_REAL_FINAL.docx', size: '84 KB', deleted: '1/20/2025', type: '📝' },
-  { name: 'definitely_not_my_todo_list.txt', size: '1 KB', deleted: '12/01/2024', type: '📄' },
-  { name: 'free_robux_generator.exe', size: '420 KB', deleted: '9/13/2024', type: '⚙️' },
-  { name: 'math_homework_answers (stolen).pdf', size: '1.2 MB', deleted: '8/28/2024', type: '📕' },
-  { name: 'ex_contact.vcf', size: '4 KB', deleted: '7/04/2024', type: '📇' },
-  { name: 'diet_plan_day1.xlsx', size: '12 KB', deleted: '1/02/2024', type: '📊' },
-  { name: 'promises.txt', size: '0 KB', deleted: '12/31/2023', type: '📄' },
+  { name: 'node_modules', size: '731 MB', deleted: '4/20/2026', type: '📁' },
+  { name: 'TODO_actually_do_these.txt', size: '14 KB', deleted: '3/01/2026', type: '📄' },
+  { name: 'spaghetti_code.js', size: '88 KB', deleted: '2/14/2026', type: '📜' },
+  { name: 'imposter_syndrome.exe', size: '0 KB', deleted: '1/10/2026', type: '⚙️' },
+  { name: 'my_stack_overflow_dignity.txt', size: '2 KB', deleted: '11/22/2025', type: '📄' },
+  { name: 'git_commit_-m_fix.patch', size: '3 KB', deleted: '10/31/2025', type: '🔧' },
+  { name: 'sleep_schedule.exe', size: '0 KB', deleted: '9/01/2025', type: '⚙️' },
+  { name: 'README (unread).md', size: '1 KB', deleted: '8/15/2025', type: '📋' },
 ];
 
 export default function RecycleBinWindow() {

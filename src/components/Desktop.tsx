@@ -194,14 +194,9 @@ export default function Desktop() {
       sessionStorage.setItem('clippy-virus-done', '1');
       const ts: ReturnType<typeof setTimeout>[] = [];
       const at = (ms: number, fn: () => void) => ts.push(setTimeout(fn, ms));
-      at(0,     () => showToast({ title: '🛡️ antivirus.exe', body: 'Installing... ██████████ 100%' }));
-      at(2500,  () => showToast({ title: '✅ antivirus.exe', body: 'Protection enabled! Your PC is safe.' }));
-      at(5500,  () => triggerClippyMessage('⚠️ Scan complete. 1,337 threats found. Removing now...', true));
-      at(8500,  () => setVirusShake(true));
-      at(9500,  () => setVirusErrors(5));
-      at(11500, () => { setRedFlicker(true); setTimeout(() => setRedFlicker(false), 1500); });
-      at(13500, () => triggerClippyMessage('Oops.', true));
-      at(15500, () => { setVirusShake(false); setVirusErrors(0); setBsodCode('CLIPPY_BETRAYAL_EXCEPTION'); setShowBSOD(true); });
+      at(0,    () => showToast({ title: '🛡️ antivirus.exe', body: 'Installing... ██████████ 100%' }));
+      at(2500, () => setVirusErrors(2));
+      at(5000, () => { setVirusErrors(0); setBsodCode('CLIPPY_BETRAYAL_EXCEPTION'); setShowBSOD(true); });
     };
 
     setVirusCallback(runVirusSequence);

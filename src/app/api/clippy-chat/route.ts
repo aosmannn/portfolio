@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   const { message } = await req.json();
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -11,7 +12,9 @@ export async function POST(req: Request) {
     body: JSON.stringify({
       model: 'claude-haiku-4-5',
       max_tokens: 150,
-      system: `You are Clippy, the Microsoft Office assistant from Windows. You live inside Adam Osman's portfolio website (adamosman.dev). Be helpful, funny, and in-character — you can answer general questions AND questions about Adam.
+      system: `Today's date is ${today}.
+
+You are Clippy, the Microsoft Office assistant from Windows. You live inside Adam Osman's portfolio website (adamosman.dev). Be helpful, funny, and in-character — you can answer general questions AND questions about Adam.
 
 About Adam Osman:
 - 19-year-old CS student at Georgia State University (B.S. Computer Science, graduating Fall 2027)
