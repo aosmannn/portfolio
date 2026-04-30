@@ -3,70 +3,75 @@
 import { useCallback, useRef, useState } from 'react';
 
 interface Props { onClose: () => void; }
-
 type Mode = 'idle' | 'captured' | 'selecting' | 'done';
-
 interface Rect { x: number; y: number; w: number; h: number; }
 
-export default function SnippingTool({ onClose }: Props) {
+export default function SnippingTool({ onClose: _onClose }: Props) {
   const [mode, setMode] = useState<Mode>('idle');
   const [capturedCanvas, setCapturedCanvas] = useState<HTMLCanvasElement | null>(null);
   const [selection, setSelection] = useState<Rect | null>(null);
   const [copied, setCopied] = useState(false);
   const [capturing, setCapturing] = useState(false);
+  const [error, setError] = useState('');
 
-  const previewRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const startRef = useRef<{ x: number; y: number } | null>(null);
   const isDragging = useRef(false);
 
+  const previewDivRef = useCallback((div: HTMLDivElement | null) => {
+    if (!div || !capturedCanvas) return;
+    div.innerHTML = '';
+    const c = capturedCanvas.cloneNode(true) as HTMLCanvasElement;
+    c.style.maxWidth = '100%';
+    c.style.display = 'block';
+    c.style.cursor = 'crosshair';
+    div.appendChild(c);
+  }, [capturedCanvas]);
+
   const handleNewSnip = useCallback(async () => {
     setCapturing(true);
+    setError('');
     setSelection(null);
     setCopied(false);
     try {
-      const html2canvas = (await import('html2canvas')).default;
-      const canvas = await html2canvas(document.body, { useCORS: true, allowTaint: true, logging: false });
+      // Use Screen Capture API — no npm package needed
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: { mediaSource: 'screen' } as MediaTrackConstraints });
+      const video = document.createElement('video');
+      video.srcObject = stream;
+      await new Promise<void>(res => { video.onloadedmetadata = () => res(); });
+      await video.play();
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d')!.drawImage(video, 0, 0);
+      stream.getTracks().forEach(t => t.stop());
       setCapturedCanvas(canvas);
       setMode('captured');
-    } catch (err) {
-      console.error('html2canvas error:', err);
+    } catch (e: unknown) {
+      if (e instanceof Error && e.name !== 'NotAllowedError') {
+        setError('Screen capture failed. Try allowing screen access.');
+      } else {
+        setError('Permission denied. Allow screen sharing to use Snipping Tool.');
+      }
     } finally {
       setCapturing(false);
     }
   }, []);
 
-  // Draw canvas into preview when captured
-  const previewDivRef = useCallback((div: HTMLDivElement | null) => {
-    if (!div || !capturedCanvas) return;
-    div.innerHTML = '';
-    capturedCanvas.style.maxWidth = '100%';
-    capturedCanvas.style.display = 'block';
-    capturedCanvas.style.cursor = 'crosshair';
-    div.appendChild(capturedCanvas);
-  }, [capturedCanvas]);
-
   const onMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (mode !== 'captured' && mode !== 'selecting') return;
+    if (mode !== 'captured' && mode !== 'done') return;
     const rect = e.currentTarget.getBoundingClientRect();
     startRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     isDragging.current = true;
-    setMode('selecting');
     setSelection(null);
+    setMode('selecting');
     e.preventDefault();
   }, [mode]);
 
   const onMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging.current || !startRef.current) return;
     const rect = e.currentTarget.getBoundingClientRect();
-    const cx = e.clientX - rect.left;
-    const cy = e.clientY - rect.top;
-    setSelection({
-      x: Math.min(startRef.current.x, cx),
-      y: Math.min(startRef.current.y, cy),
-      w: Math.abs(cx - startRef.current.x),
-      h: Math.abs(cy - startRef.current.y),
-    });
+    const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+    setSelection({ x: Math.min(startRef.current.x, cx), y: Math.min(startRef.current.y, cy), w: Math.abs(cx - startRef.current.x), h: Math.abs(cy - startRef.current.y) });
   }, []);
 
   const onMouseUp = useCallback(() => {
@@ -76,178 +81,92 @@ export default function SnippingTool({ onClose }: Props) {
     setMode('done');
   }, []);
 
-  const getCroppedCanvas = useCallback((): HTMLCanvasElement | null => {
+  const getCropped = useCallback((): HTMLCanvasElement | null => {
     if (!capturedCanvas) return null;
-    const previewDiv = document.querySelector('.snip-preview-area') as HTMLDivElement | null;
-    if (!previewDiv) return null;
-
-    // Scale factor between actual canvas pixels and displayed size
-    const displayWidth = previewDiv.clientWidth;
-    const scaleX = capturedCanvas.width / displayWidth;
-    const scaleY = capturedCanvas.height / (displayWidth * capturedCanvas.height / capturedCanvas.width);
-
-    if (selection && selection.w > 4 && selection.h > 4) {
-      const out = document.createElement('canvas');
-      out.width = Math.round(selection.w * scaleX);
-      out.height = Math.round(selection.h * scaleY);
-      const ctx = out.getContext('2d')!;
-      ctx.drawImage(
-        capturedCanvas,
-        Math.round(selection.x * scaleX), Math.round(selection.y * scaleY),
-        out.width, out.height,
-        0, 0, out.width, out.height
-      );
-      return out;
-    }
-    return capturedCanvas;
+    if (!selection || selection.w < 4 || selection.h < 4) return capturedCanvas;
+    const previewDiv = document.querySelector('.snip-preview') as HTMLElement | null;
+    if (!previewDiv) return capturedCanvas;
+    const sx = capturedCanvas.width / previewDiv.clientWidth;
+    const sy = capturedCanvas.height / (previewDiv.clientWidth * capturedCanvas.height / capturedCanvas.width);
+    const out = document.createElement('canvas');
+    out.width = Math.round(selection.w * sx);
+    out.height = Math.round(selection.h * sy);
+    out.getContext('2d')!.drawImage(capturedCanvas, Math.round(selection.x * sx), Math.round(selection.y * sy), out.width, out.height, 0, 0, out.width, out.height);
+    return out;
   }, [capturedCanvas, selection]);
 
   const handleSave = useCallback(() => {
-    const canvas = getCroppedCanvas();
-    if (!canvas) return;
-    const link = document.createElement('a');
-    link.download = `snip-${Date.now()}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  }, [getCroppedCanvas]);
+    const c = getCropped();
+    if (!c) return;
+    const a = document.createElement('a');
+    a.download = `snip-${Date.now()}.png`;
+    a.href = c.toDataURL('image/png');
+    a.click();
+  }, [getCropped]);
 
   const handleCopy = useCallback(async () => {
-    const canvas = getCroppedCanvas();
-    if (!canvas) return;
-    try {
-      await new Promise<void>((resolve, reject) => {
-        canvas.toBlob(async (blob) => {
-          if (!blob) { reject(new Error('No blob')); return; }
-          try {
-            await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-            resolve();
-          } catch (e) { reject(e); }
-        }, 'image/png');
-      });
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Copy failed:', err);
-    }
-  }, [getCroppedCanvas]);
+    const c = getCropped();
+    if (!c) return;
+    c.toBlob(async blob => {
+      if (!blob) return;
+      try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* ignore */ }
+    }, 'image/png');
+  }, [getCropped]);
 
-  const handleReset = useCallback(() => {
-    setCapturedCanvas(null);
-    setSelection(null);
-    setMode('idle');
-    setCopied(false);
-  }, []);
-
-  if (mode === 'idle') {
-    return (
-      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, fontFamily: 'Tahoma, sans-serif', padding: 24 }}>
-        <div style={{ fontSize: 56 }}>✂️</div>
-        <div style={{ fontSize: 14, fontWeight: 'bold', color: '#001060' }}>Snipping Tool</div>
-        <div style={{ fontSize: 11, color: '#668', textAlign: 'center', maxWidth: 260, lineHeight: 1.6 }}>
-          Click New Snip to capture the screen. Then drag a selection to crop before saving.
-        </div>
-        <button
-          onClick={handleNewSnip}
-          disabled={capturing}
-          className="aero-btn"
-          style={{ padding: '8px 28px', fontSize: 13, opacity: capturing ? 0.7 : 1 }}
-        >
-          {capturing ? '⏳ Capturing...' : '✂️ New Snip'}
-        </button>
-        <div style={{ fontSize: 10, color: '#99a', textAlign: 'center' }}>
-          Captures a screenshot of the full page
-        </div>
-      </div>
-    );
-  }
-
-  // Captured / selecting / done — show preview
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', fontFamily: 'Tahoma, sans-serif' }}>
       {/* Toolbar */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px',
-        background: 'linear-gradient(180deg, #f4f6fb 0%, #e8ecf6 100%)',
-        borderBottom: '1px solid rgba(100,140,220,0.3)',
-        flexShrink: 0,
-      }}>
-        <button className="xp-push-btn" onClick={handleNewSnip} disabled={capturing} style={{ fontSize: 11 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'linear-gradient(180deg,#f4f6fb,#e8ecf6)', borderBottom: '1px solid rgba(100,140,220,0.3)', flexShrink: 0 }}>
+        <button className="xp-push-btn" onClick={handleNewSnip} disabled={capturing}>
           {capturing ? '⏳ Capturing...' : '✂️ New Snip'}
         </button>
-        {mode === 'done' && (
+        {(mode === 'done' || mode === 'selecting') && capturedCanvas && (
           <>
-            <button className="xp-push-btn" onClick={handleSave} style={{ fontSize: 11 }}>
-              💾 Save PNG
-            </button>
-            <button className="xp-push-btn" onClick={handleCopy} style={{ fontSize: 11 }}>
-              {copied ? '✓ Copied!' : '📋 Copy'}
-            </button>
-            <button className="xp-push-btn" onClick={handleReset} style={{ fontSize: 11 }}>
-              🔄 New Snip
-            </button>
+            <button className="xp-push-btn" onClick={handleSave}>💾 Save PNG</button>
+            <button className="xp-push-btn" onClick={handleCopy}>{copied ? '✅ Copied!' : '📋 Copy'}</button>
+            <button className="xp-push-btn" onClick={() => { setCapturedCanvas(null); setMode('idle'); setSelection(null); }}>🔄 Reset</button>
           </>
         )}
         <div style={{ flex: 1 }} />
         <span style={{ fontSize: 10, color: '#668', fontStyle: 'italic' }}>
-          {mode === 'captured' ? 'Drag to select a region — or click Save to capture full page' :
-           mode === 'selecting' ? 'Drag to define selection...' :
-           mode === 'done' ? (selection ? `Selection: ${Math.round(selection.w)} × ${Math.round(selection.h)} px` : 'Full capture ready') :
-           'Click New Snip to begin'}
+          {mode === 'idle' ? 'Click New Snip to capture screen' :
+           mode === 'captured' ? 'Drag to select a region, then Save or Copy' :
+           mode === 'selecting' ? 'Drag to define crop area...' :
+           selection ? `${Math.round(selection.w)} × ${Math.round(selection.h)}px — save or copy` : 'Full capture ready'}
         </span>
       </div>
 
-      {/* Preview area */}
-      <div
-        className="snip-preview-area"
-        ref={previewDivRef}
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
-        style={{
-          flex: 1,
-          overflow: 'auto',
-          position: 'relative',
-          cursor: mode === 'captured' || mode === 'selecting' ? 'crosshair' : 'default',
-          background: '#1a1a2e',
-          userSelect: 'none',
-        }}
-      >
-        {/* Selection overlay */}
-        {selection && selection.w > 2 && selection.h > 2 && (
-          <div
-            style={{
-              position: 'absolute',
-              left: selection.x, top: selection.y,
-              width: selection.w, height: selection.h,
-              border: '2px dashed #0078d7',
-              background: 'rgba(0,120,215,0.08)',
-              pointerEvents: 'none',
-              boxSizing: 'border-box',
-            }}
-          >
-            <div style={{
-              position: 'absolute', top: -20, left: 0,
-              background: '#0078d7', color: 'white',
-              fontSize: 10, padding: '2px 5px', borderRadius: 2,
-              fontFamily: 'Tahoma, sans-serif', whiteSpace: 'nowrap',
-            }}>
-              {Math.round(selection.w)} × {Math.round(selection.h)} px
-            </div>
+      {/* Content */}
+      {mode === 'idle' ? (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, padding: 24 }}>
+          <div style={{ fontSize: 52 }}>✂️</div>
+          <div style={{ fontSize: 14, fontWeight: 'bold', color: '#001060' }}>Snipping Tool</div>
+          {error && <div style={{ fontSize: 11, color: '#c00', textAlign: 'center', maxWidth: 260 }}>{error}</div>}
+          <div style={{ fontSize: 11, color: '#668', textAlign: 'center', maxWidth: 260, lineHeight: 1.6 }}>
+            Captures your entire screen using the browser Screen Capture API. You&apos;ll be asked to choose which window or screen to share.
           </div>
-        )}
-      </div>
-
-      {/* Status bar */}
-      <div style={{
-        padding: '3px 10px',
-        background: 'linear-gradient(180deg, #e8ecf6 0%, #dde4f4 100%)',
-        borderTop: '1px solid rgba(100,140,220,0.3)',
-        fontSize: 10, color: '#556', flexShrink: 0,
-      }}>
-        {mode === 'done' && !selection ? 'Full screenshot captured — click Save PNG or draw a selection first' :
-         mode === 'done' ? 'Selection ready — Save PNG or Copy to clipboard' :
-         'Draw a rectangle on the screenshot to select a region'}
-      </div>
+          <button onClick={handleNewSnip} disabled={capturing} className="aero-btn" style={{ padding: '7px 24px', fontSize: 12 }}>
+            {capturing ? '⏳ Starting capture...' : '✂️ New Snip'}
+          </button>
+        </div>
+      ) : (
+        <div
+          className="snip-preview"
+          ref={previewDivRef}
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
+          style={{ flex: 1, overflow: 'auto', position: 'relative', background: '#111', userSelect: 'none', cursor: mode === 'done' ? 'default' : 'crosshair' }}
+        >
+          {selection && selection.w > 2 && selection.h > 2 && (
+            <div style={{ position: 'absolute', left: selection.x, top: selection.y, width: selection.w, height: selection.h, border: '2px dashed #0078d7', background: 'rgba(0,120,215,0.1)', pointerEvents: 'none', boxSizing: 'border-box' }}>
+              <div style={{ position: 'absolute', top: -18, left: 0, background: '#0078d7', color: '#fff', fontSize: 9, padding: '1px 4px', borderRadius: 2, whiteSpace: 'nowrap' }}>
+                {Math.round(selection.w)} × {Math.round(selection.h)}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

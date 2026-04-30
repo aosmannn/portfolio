@@ -120,10 +120,9 @@ function WakaStats() {
 }
 
 export default function SkillsWindow() {
-  const [tab, setTab] = useState<'skills' | 'experience' | 'coding'>('skills');
+  const [tab, setTab] = useState<'experience' | 'coding'>('experience');
 
   const tabs: { id: typeof tab; label: string }[] = [
-    { id: 'skills', label: 'Skills' },
     { id: 'experience', label: 'Experience' },
     { id: 'coding', label: '⏱️ Coding Stats' },
   ];
@@ -150,30 +149,7 @@ export default function SkillsWindow() {
 
       {/* Content */}
       <div style={{ flex: 1, overflow: 'auto', padding: 20 }}>
-        {tab === 'skills' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {SKILLS.map(s => (
-              <div key={s.label}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: 12, color: '#333' }}>
-                  <span style={{ fontWeight: 'bold' }}>{s.label}</span>
-                  <span style={{ color: '#0078d7' }}>{s.pct}%</span>
-                </div>
-                <div style={{
-                  height: 18, background: '#d4e8f8', borderRadius: 3,
-                  border: '1px solid #a8d0f0', overflow: 'hidden',
-                }}>
-                  <div style={{
-                    width: `${s.pct}%`, height: '100%',
-                    background: 'linear-gradient(180deg, #56b4f7 0%, #0078d7 40%, #005fa3 60%, #1e8ef5 100%)',
-                    borderRadius: 2,
-                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4)',
-                    transition: 'width 0.6s ease',
-                  }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        
 
         {tab === 'experience' && (
           <div style={{ position: 'relative', paddingLeft: 24 }}>

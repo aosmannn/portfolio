@@ -243,11 +243,6 @@ export default function Desktop() {
         />
       ))}
 
-      {/* Snipping Tool icon on desktop */}
-      <DesktopIcon label="Snipping Tool" emoji="✂️"
-        defaultX={100} defaultY={290}
-        onDoubleClick={() => openWindow('snip')}
-      />
 
       {/* Sticky Note icon on desktop */}
       <DesktopIcon label="Sticky Note" emoji="📌"
